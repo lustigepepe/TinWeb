@@ -3,7 +3,7 @@
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the QtWebEngine module of the Qt Toolkit.
+** This file is part of the demonstration applications of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
@@ -48,57 +48,12 @@
 **
 ****************************************************************************/
 
-#include "utils.h"
-#include "mainwindow.h"
+#include "document.h"
 
-#ifndef QT_NO_WIDGETS
-#include <QtWidgets/QApplication>
-typedef QApplication Application;
-#else
-#include <QtGui/QGuiApplication>
-typedef QGuiApplication Application;
-#endif
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWebEngine/qtwebengineglobal.h>
-#include <QWebEngineView>
-
-static QUrl startupUrl()
+void Document::setText(const QString &text)
 {
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
-    }
-    return QUrl(QStringLiteral("http://qt.io/"));
-}
-
-int main(int argc, char **argv)
-{
-//    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-//    Application app(argc, argv);
-
-//    QtWebEngine::initialize();
-
-//    QQmlApplicationEngine appEngine;
-//    Utils utils;
-//    appEngine.rootContext()->setContextProperty("utils", &utils);
-//    appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
-//    QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
-
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication app(argc, argv);
-    MainWindow w;
-    w.show();
-
-
-
-
-    return app.exec();
+    if (text == m_text)
+        return;
+    m_text = text;
+    emit textChanged(m_text);
 }

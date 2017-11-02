@@ -3,7 +3,7 @@
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the QtWebEngine module of the Qt Toolkit.
+** This file is part of the demonstration applications of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
@@ -48,57 +48,26 @@
 **
 ****************************************************************************/
 
-#include "utils.h"
-#include "mainwindow.h"
+#ifndef DOCUMENT_H
+#define DOCUMENT_H
 
-#ifndef QT_NO_WIDGETS
-#include <QtWidgets/QApplication>
-typedef QApplication Application;
-#else
-#include <QtGui/QGuiApplication>
-typedef QGuiApplication Application;
-#endif
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWebEngine/qtwebengineglobal.h>
-#include <QWebEngineView>
+#include <QObject>
+#include <QString>
 
-static QUrl startupUrl()
+class Document : public QObject
 {
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
-    }
-    return QUrl(QStringLiteral("http://qt.io/"));
-}
+    Q_OBJECT
+    Q_PROPERTY(QString text MEMBER m_text NOTIFY textChanged FINAL)
+public:
+    explicit Document(QObject *parent = nullptr) : QObject(parent) {}
 
-int main(int argc, char **argv)
-{
-//    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    void setText(const QString &text);
 
-//    Application app(argc, argv);
+signals:
+    void textChanged(const QString &text);
 
-//    QtWebEngine::initialize();
+private:
+    QString m_text;
+};
 
-//    QQmlApplicationEngine appEngine;
-//    Utils utils;
-//    appEngine.rootContext()->setContextProperty("utils", &utils);
-//    appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
-//    QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
-
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication app(argc, argv);
-    MainWindow w;
-    w.show();
-
-
-
-
-    return app.exec();
-}
+#endif // DOCUMENT_H
