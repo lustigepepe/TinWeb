@@ -23,6 +23,9 @@ OTHER_FILES += ApplicationRoot.qml \
 
 RESOURCES += resources.qrc
 
+FORMS += \
+        mainwindow.ui
+
 QT += qml quick webengine webenginewidgets webchannel
 qtHaveModule(widgets) {
     greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

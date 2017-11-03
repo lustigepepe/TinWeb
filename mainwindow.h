@@ -6,7 +6,7 @@
 #include <QMainWindow>
 #include <QtCore/QFileInfo>
 #include <QtCore/QUrl>
-
+#include <QStringListModel>
 namespace Ui {
 class MainWindow;
 }
@@ -31,6 +31,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Document m_content;
+    QStringListModel *listViewModel;
 };
 
 #endif // MAINWINDOW_H
