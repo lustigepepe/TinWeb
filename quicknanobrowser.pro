@@ -2,18 +2,21 @@ requires(qtConfig(accessibility))
 
 TEMPLATE = app
 TARGET = TinWeb
+CONFIG += c++14
 
 HEADERS += \
         utils.h \
         mainwindow.h \
         previewpage.h \
-        document.h
+        document.h \
+    xmllibrary.h
 
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
         previewpage.cpp \
-        document.cpp
+        document.cpp \
+        xmllibrary.cpp
 
 OTHER_FILES += ApplicationRoot.qml \
                BrowserDialog.qml \
@@ -26,7 +29,7 @@ RESOURCES += resources.qrc
 FORMS += \
         mainwindow.ui
 
-QT += qml quick webengine webenginewidgets webchannel
+QT += qml quick webengine webenginewidgets webchannel xml
 qtHaveModule(widgets) {
     greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
     # QApplication is required to get native styling with QtQuickControls

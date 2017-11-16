@@ -63,6 +63,7 @@ typedef QGuiApplication Application;
 #include <QtWebEngine/qtwebengineglobal.h>
 #include <QWebEngineView>
 
+std::pair<int, char**> appInt;
 static QUrl startupUrl()
 {
     QUrl ret;
@@ -91,7 +92,8 @@ int main(int argc, char **argv)
 //    appEngine.rootContext()->setContextProperty("utils", &utils);
 //    appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
 //    QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
-
+    appInt.first = argc;
+    appInt.second = argv;
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication app(argc, argv);
     MainWindow w;
