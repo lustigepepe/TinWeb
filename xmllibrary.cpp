@@ -31,41 +31,34 @@ void XMlLibrary::writeSite(QString& path, bool list, QString& name)
 void XMlLibrary::readSite()
 {
     QDomDocument doc;
-    if (!xmlFile->open(QIODevice::ReadOnly) || doc.setContent(xmlFile) )
+    if (!xmlFile->open(QIODevice::ReadOnly))
         return;
-    //    QTextStream in(xmlFile);
-    //    QString line;
-    //    while (in.readLineInto(&line))
-    //    {
-    //        xmlData* temp = new xmlData();
-    //        temp->name = line;
-    //        if(xmlVec)
-    //            xmlVec->push_back(temp);
-    //    }
+    if (!doc.setContent(xmlFile)) {
+        xmlFile->close();
+        return;
+    }
     xmlFile->close();
 
-    // print out the element names of all elements that are direct children
-    // of the outermost element.
     QDomElement docElem = doc.documentElement();
     QDomNode n = docElem.firstChild();
     while(!n.isNull()) {
         QDomElement e = n.toElement(); // try to convert the node to an element.
-        if(!e.isNull() && e.tagName() == "item") {
-            QDomElement url = n.firstChildElement("url");
-            QDomElement list = n.firstChildElement("list");
-            QDomElement name = n.firstChildElement("name");
-
+        if(!e.isNull() && e.tagName() == "item")
+        {
+            QDomElement url = e.firstChildElement("url");
+            QDomElement list = e.firstChildElement("list");
+            QDomElement name = e.firstChildElement("name");
             xmlData* temp = new xmlData();
-            if(!url.toDocument().isNull())
-                temp->url = url.toDocument().toString();
-            if(!list.toDocument().isNull())
-                temp->list = list.toDocument().toString() == "true" || "True" ? true : false;
-            if(!name.toDocument().isNull())
-                temp->name = name.toDocument().toString();
+            if(!url.isNull())
+                temp->url = url.text();
+            if(!list.isNull())
+                temp->list = list.text() == "true" || list.text() == "True";
+            if(!name.isNull())
+                temp->name = name.text();
             xmlVec->push_back(temp);
         }
+        n = n.nextSibling();
     }
-    n = n.nextSibling();
 }
 
 void XMlLibrary::parseString(QString &line)
