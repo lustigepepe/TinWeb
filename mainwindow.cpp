@@ -40,14 +40,14 @@ void MainWindow::on_newSite_clicked()
 
     QString st (":/xml/xml/main.xml");
     mainXml = new XMlLibrary(&st);
-    mainXml->readSite();
+    mainXml->readWriteSite();
 
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString base = info.baseName();
     QStringList list;
     list << "Clair de Lune" << "Reverie" << "Prelude";
-    list << mainXml->xmlVec->at(0)->name;
-
+    if (!mainXml && mainXml->xmlVec->empty())
+        list << mainXml->xmlVec->at(0)->name;
     // Populate our model
     listViewModel->setStringList(list);
     ui->allSitesLists->setModel(listViewModel);
