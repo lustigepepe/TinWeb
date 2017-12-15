@@ -9,7 +9,7 @@ HEADERS += \
         mainwindow.h \
         previewpage.h \
         document.h \
-    xmllibrary.h
+        xmllibrary.h
 
 SOURCES += \
         main.cpp \
@@ -22,7 +22,8 @@ OTHER_FILES += ApplicationRoot.qml \
                BrowserDialog.qml \
                BrowserWindow.qml \
                DownloadView.qml \
-               FullScreenNotification.qml
+               FullScreenNotification.qml \
+               xml/main.xml
 
 RESOURCES += resources.qrc
 
@@ -38,11 +39,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 target.path = /Users/bic_mac/Documents/QT/quicknanobrowser
 INSTALLS += target
 
+#using to for xmlSettings
+copydata.commands = $(COPY_DIR) $$PWD/xml/main.xml $$OUT_PWD
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata
+
 macx
 {
-
     ICON = icon.icns
-
 }
 win32
 {

@@ -1,14 +1,22 @@
 #include "xmllibrary.h"
 #include <QIODevice>
 #include <QDomDocument>
+#include <QDir>
+#include <QString>
+#include <QCoreApplication>
 
 XMlLibrary::XMlLibrary(QString* path)
     : xmlVec(new std::vector<xmlData*>)
 {
+
     if (path)
         xmlFile = new QFile(*path);
     else
-        xmlFile = new QFile(":xml/xml/main.xml");
+    {
+        QString current =  QDir::currentPath();
+        QStringList list = current.split(QFileInfo(QCoreApplication::applicationFilePath()).fileName());
+        xmlFile = new QFile(list.at(0)+QString("main.xml"));
+    }
 }
 
 XMlLibrary::~XMlLibrary()

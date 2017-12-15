@@ -12,7 +12,4 @@
         <file alias="process-stop.png">icons/process-stop.png</file>
         <file alias="view-refresh.png">icons/view-refresh.png</file>
     </qresource>
-    <qresource prefix="/xml">
-        <file>xml/main.xml</file>
-    </qresource>
 </RCC>

@@ -38,8 +38,8 @@ void MainWindow::on_newSite_clicked()
 
 //    QString fileName = QFileDialog::getOpenFileName(this);
 
-    QString st (":/xml/xml/main.xml");
-    mainXml = new XMlLibrary(&st);
+    //QString st (":/xml/xml/main.xml");
+    mainXml = new XMlLibrary();
     mainXml->readWriteSite();
 
     QFileInfo info( QFileDialog::getOpenFileName(this));
