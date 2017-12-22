@@ -46,7 +46,7 @@ void MainWindow::on_newSite_clicked()
     QString base = info.baseName();
     QStringList list;
     list << "Clair de Lune" << "Reverie" << "Prelude";
-    if (!mainXml && mainXml->xmlVec->empty())
+    if (mainXml && !mainXml->xmlVec->empty())
         list << mainXml->xmlVec->at(0)->name;
     // Populate our model
     listViewModel->setStringList(list);
