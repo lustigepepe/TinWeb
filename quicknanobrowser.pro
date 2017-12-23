@@ -30,7 +30,7 @@ RESOURCES += resources.qrc
 FORMS += \
         mainwindow.ui
 
-QT += qml quick webengine webenginewidgets webchannel xml
+QT += qml quick webengine webenginewidgets webchannel xml core
 qtHaveModule(widgets) {
     greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
     # QApplication is required to get native styling with QtQuickControls

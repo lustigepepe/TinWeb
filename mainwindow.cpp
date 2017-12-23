@@ -40,19 +40,25 @@ void MainWindow::on_newSite_clicked()
 
     //QString st (":/xml/xml/main.xml");
     mainXml = new XMlLibrary();
-    mainXml->readWriteSite();
+    QString path("schnick/schnack");
+    QString name("schnickMan");
 
+    mainXml->readWriteSite(&path, false, &name);
+//    mainXml->creatWhat();
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString base = info.baseName();
     QStringList list;
     list << "Clair de Lune" << "Reverie" << "Prelude";
     if (mainXml && !mainXml->xmlVec->empty())
-        list << mainXml->xmlVec->at(0)->name;
+    {
+        for(auto &x : *mainXml->xmlVec)
+            list << x->name;
+    }
     // Populate our model
     listViewModel->setStringList(list);
     ui->allSitesLists->setModel(listViewModel);
-//    // Glue model and view together
-//    ui->listView->setModel(model);
+    //    // Glue model and view together
+    //    ui->listView->setModel(model);
 //    ui->comboBox->setModel(model);
 //    // Add additional feature so that
 //    // we can manually modify the data in ListView
