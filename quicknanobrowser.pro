@@ -9,14 +9,16 @@ HEADERS += \
         mainwindow.h \
         previewpage.h \
         document.h \
-        xmllibrary.h
+        xmllibrary.h \
+        singleton.h
 
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
         previewpage.cpp \
         document.cpp \
-        xmllibrary.cpp
+        xmllibrary.cpp \
+        singleton.cpp
 
 OTHER_FILES += ApplicationRoot.qml \
                BrowserDialog.qml \

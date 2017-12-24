@@ -40,7 +40,7 @@
      <string>New List</string>
     </property>
    </widget>
-   <widget class="QListView" name="allSitesLists">
+   <widget class="QListView" name="ItemInList">
     <property name="geometry">
      <rect>
       <x>175</x>

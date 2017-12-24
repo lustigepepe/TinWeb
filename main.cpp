@@ -81,7 +81,7 @@ static QUrl startupUrl()
 
 int main(int argc, char **argv)
 {
-//    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 //    Application app(argc, argv);
 

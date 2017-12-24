@@ -8,7 +8,6 @@
 XMlLibrary::XMlLibrary(QString* path)
     : xmlVec(new std::vector<xmlData*>)
 {
-
     if (path)
         xmlFile = new QFile(*path);
     else

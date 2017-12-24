@@ -4,14 +4,33 @@
 #include <QFile>
 #include <QTextStream>
 #include "previewpage.h"
-//#include <QWebEngineView>
-#include <QQmlApplicationEngine>
-//#include <qtwebengineglobal.h>
+#include <QWebEngineView>
 #include <QWebChannel>
 #include <memory>
 #include <QtWidgets>
 #include <QFileInfo>
 #include <QDir>
+#include <QDebug>
+// WebEngine
+#include "utils.h"
+#include <QtGui/QGuiApplication>
+#include <QtQml/QQmlContext>
+#include <QtWebEngine/qtwebengineglobal.h>
+
+QUrl MainWindow::startupUrl(QString* url)
+{
+    QUrl ret;
+    QStringList args(qApp->arguments());
+    args.takeFirst();
+    Q_FOREACH (const QString& arg, args) {
+        if (arg.startsWith(QLatin1Char('-')))
+             continue;
+        ret = Utils::fromUserInput(arg);
+        if (ret.isValid())
+            return ret;
+    }
+    return QUrl((url ?  *url : "http://qt.io/"));
+}
 
 extern std::pair<int, char**> appInt;
 MainWindow::MainWindow(QWidget *parent) :
@@ -30,21 +49,16 @@ MainWindow::~MainWindow()
         delete mainXml;
 }
 
-
 void MainWindow::on_newSite_clicked()
 {
     // neue seite öffnen um dann eine seite angeben die in der liste erscheint
     // rechtsklick -> edit
 
-//    QString fileName = QFileDialog::getOpenFileName(this);
-
-    //QString st (":/xml/xml/main.xml");
     mainXml = new XMlLibrary();
     QString path("schnick/schnack");
     QString name("schnickMan");
 
     mainXml->readWriteSite(&path, false, &name);
-//    mainXml->creatWhat();
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString base = info.baseName();
     QStringList list;
@@ -56,7 +70,7 @@ void MainWindow::on_newSite_clicked()
     }
     // Populate our model
     listViewModel->setStringList(list);
-    ui->allSitesLists->setModel(listViewModel);
+    ui->ItemInList->setModel(listViewModel);
     //    // Glue model and view together
     //    ui->listView->setModel(model);
 //    ui->comboBox->setModel(model);
@@ -76,24 +90,21 @@ void MainWindow::on_newList_clicked()
 
 void MainWindow::on_overView_clicked()
 {
-
 }
 
 
-void MainWindow::on_allSitesLists_clicked(const QModelIndex &index)
+void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
+{
+//    qDebug() << "on_overView_clicked!!!!!!!!!!!";
+    createBrowser();
+}
+
+void MainWindow::on_ItemInList_doubleClicked(const QModelIndex &index)
 {
 
-}
-
-
-void MainWindow::on_allSitesLists_doubleClicked(const QModelIndex &index)
-{
-
 
 
 }
-
-
 
 void MainWindow::dropEvent(QDropEvent *e)
 {
@@ -107,6 +118,17 @@ void MainWindow::dropEvent(QDropEvent *e)
 //        isLeftClick = false;
 //    }
     //super::mousePressEvent(event);
+}
+
+void MainWindow::createBrowser()
+{
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    browser = std::make_unique<QQmlApplicationEngine>();
+    Utils utils;
+    browser->rootContext()->setContextProperty("utils", &utils);
+    browser->load(QUrl("qrc:/ApplicationRoot.qml"));
+    QMetaObject::invokeMethod(browser->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
 }
 
 
