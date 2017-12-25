@@ -17,22 +17,7 @@
 #include <QtQml/QQmlContext>
 #include <QtWebEngine/qtwebengineglobal.h>
 
-QUrl MainWindow::startupUrl(QString* url)
-{
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
-    }
-    return QUrl((url ?  *url : "http://qt.io/"));
-}
 
-extern std::pair<int, char**> appInt;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -95,8 +80,11 @@ void MainWindow::on_overView_clicked()
 
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
-//    qDebug() << "on_overView_clicked!!!!!!!!!!!";
-    createBrowser();
+
+//    qDebug() << j.s+" on_overView_clicked!!!!!!!!!!!";
+
+    Browser::instance();
+
 }
 
 void MainWindow::on_ItemInList_doubleClicked(const QModelIndex &index)
@@ -119,8 +107,22 @@ void MainWindow::dropEvent(QDropEvent *e)
 //    }
     //super::mousePressEvent(event);
 }
+QUrl Browser::startupUrl(QString* url)
+{
+    QUrl ret;
+    QStringList args(qApp->arguments());
+    args.takeFirst();
+    Q_FOREACH (const QString& arg, args) {
+        if (arg.startsWith(QLatin1Char('-')))
+             continue;
+        ret = Utils::fromUserInput(arg);
+        if (ret.isValid())
+            return ret;
+    }
+    return QUrl((url ?  *url : "http://qt.io/"));
+}
 
-void MainWindow::createBrowser()
+void Browser::createBrowser()
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

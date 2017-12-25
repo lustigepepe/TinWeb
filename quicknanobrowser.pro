@@ -17,8 +17,7 @@ SOURCES += \
         mainwindow.cpp \
         previewpage.cpp \
         document.cpp \
-        xmllibrary.cpp \
-        singleton.cpp
+        xmllibrary.cpp
 
 OTHER_FILES += ApplicationRoot.qml \
                BrowserDialog.qml \

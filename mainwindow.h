@@ -10,13 +10,13 @@
 #include <QListView>
 #include <QtWidgets/QApplication>
 #include <QtQml/QQmlApplicationEngine>
-
+#include "singleton.h"
 typedef QApplication Application;
 
 namespace Ui {
 class MainWindow;
 }
-
+class Browser;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -42,9 +42,16 @@ private:
     Document m_content;
     QStringListModel *listViewModel;
     XMlLibrary* mainXml;
-    std::unique_ptr<QQmlApplicationEngine> browser;
-    void createBrowser();
-    QUrl startupUrl(QString* url = nullptr);
+    friend class Browser;
 };
 
+class Browser : public Singleton <int>
+{
+public:
+  // friend class Singleton;
+    void createBrowser();
+    std::unique_ptr<QQmlApplicationEngine> browser;
+    QUrl startupUrl(QString* url = nullptr);
+
+};
 #endif // MAINWINDOW_H
