@@ -17,14 +17,12 @@
 #include <QtQml/QQmlContext>
 #include <QtWebEngine/qtwebengineglobal.h>
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     listViewModel = new QStringListModel(this);
-    //loadTextFile();
 }
 
 MainWindow::~MainWindow()
@@ -32,6 +30,7 @@ MainWindow::~MainWindow()
     delete ui;
     if (mainXml)
         delete mainXml;
+    qDebug() << " Destroy MainWindow !!--" << endl;
 }
 
 void MainWindow::on_newSite_clicked()
@@ -76,15 +75,46 @@ void MainWindow::on_newList_clicked()
 void MainWindow::on_overView_clicked()
 {
 }
+QUrl Browser::startupUrl(QString* url)
+{
+    QUrl ret;
+    QStringList args(qApp->arguments());
+    args.takeFirst();
+    Q_FOREACH (const QString& arg, args) {
+        if (arg.startsWith(QLatin1Char('-')))
+             continue;
+        ret = Utils::fromUserInput(arg);
+        if (ret.isValid())
+            return ret;
+    }
+    return QUrl((url ?  *url : "http://qt.io/"));
+}
 
+QUrl MainWindow::startupUrl(QString* url)
+{
+    QUrl ret;
+    QStringList args(qApp->arguments());
+    args.takeFirst();
+    Q_FOREACH (const QString& arg, args) {
+        if (arg.startsWith(QLatin1Char('-')))
+             continue;
+        ret = Utils::fromUserInput(arg);
+        if (ret.isValid())
+            return ret;
+    }
+    return QUrl((url ?  *url : "http://qt.io/"));
+}
 
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
-
-//    qDebug() << j.s+" on_overView_clicked!!!!!!!!!!!";
-
-    Browser::instance();
-
+    if(!Browser::IsRuning)
+    {
+        Browser::instance()->createBrowser();
+    }
+    else
+    {
+        // Browser::browser;
+    }
 }
 
 void MainWindow::on_ItemInList_doubleClicked(const QModelIndex &index)
@@ -107,20 +137,6 @@ void MainWindow::dropEvent(QDropEvent *e)
 //    }
     //super::mousePressEvent(event);
 }
-QUrl Browser::startupUrl(QString* url)
-{
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
-    }
-    return QUrl((url ?  *url : "http://qt.io/"));
-}
 
 void Browser::createBrowser()
 {
@@ -132,5 +148,3 @@ void Browser::createBrowser()
     browser->load(QUrl("qrc:/ApplicationRoot.qml"));
     QMetaObject::invokeMethod(browser->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
 }
-
-

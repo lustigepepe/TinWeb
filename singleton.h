@@ -1,37 +1,45 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
-
-
+#include <QDebug>
 
 template<typename C>
 class Singleton
 {
 public:
     static C* instance();
-private:
-    static C* _instance;
+    virtual ~Singleton();
+    static bool IsRuning;
+
+protected:
     Singleton(){}
-    Singleton(const Singleton& );
+
+private:
+    Singleton(const Singleton&);
+    static C* _instance;
     Singleton& operator = (const Singleton&);
-    ~Singleton();
 };
+
 template<typename C>
 C* Singleton<C>::instance()
 {
     if(!_instance)
+    {
         _instance = new C();
+        IsRuning = true;
+    }
     return _instance;
 }
+
 template<typename C>
 Singleton<C>::~Singleton()
 {
-    if(0 != Singleton::_instance)
+    if(0 != _instance)
     {
-        delete Singleton::_instance;
-        Singleton::_instance = 0;
+        delete _instance;
+        _instance = 0;
     }
 }
 template<typename C>C* Singleton<C>::_instance = 0;
-
+template<typename C> bool Singleton<C>::IsRuning = false;
 
 #endif // SINGLETON_H
