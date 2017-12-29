@@ -63,8 +63,8 @@ typedef QGuiApplication Application;
 #include <QtWebEngine/qtwebengineglobal.h>
 #include <QWebEngineView>
 
-std::pair<int, char**> appInt;
-static QUrl startupUrl()
+
+QUrl startupUrl(QString* url = nullptr)
 {
     QUrl ret;
     QStringList args(qApp->arguments());
@@ -76,28 +76,44 @@ static QUrl startupUrl()
         if (ret.isValid())
             return ret;
     }
-    return QUrl(QStringLiteral("http://qt.io/"));
+    return QUrl((url ?  *url : "http://qt.io/"));
 }
+
+//static QUrl startupUrl()
+//{
+//    QUrl ret;
+//    QStringList args(qApp->arguments());
+//    args.takeFirst();
+//    Q_FOREACH (const QString& arg, args) {
+//        if (arg.startsWith(QLatin1Char('-')))
+//             continue;
+//        ret = Utils::fromUserInput(arg);
+//        if (ret.isValid())
+//            return ret;
+//    }
+//    return QUrl(QStringLiteral("http://qt.io/"));
+//}
 
 int main(int argc, char **argv)
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-//    Application app(argc, argv);
-
-//    QtWebEngine::initialize();
-
-//    QQmlApplicationEngine appEngine;
-//    Utils utils;
-//    appEngine.rootContext()->setContextProperty("utils", &utils);
-//    appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
-//    QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
-    appInt.first = argc;
-    appInt.second = argv;
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication app(argc, argv);
-    MainWindow w;
-    w.show();
-
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    Application app(argc, argv);
+    MainWindow mainW;
+    mainW.show();
+    QtWebEngine::initialize();
+    //    Test
+    //   Browser::instance()->createBrowser();
+    mainW.browserApp = std::make_unique<QQmlApplicationEngine>();
+    Utils utils;
+    mainW.browserApp->rootContext()->setContextProperty("utils", &utils);
+    //    mainW.browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
+    //    QMetaObject::invokeMethod(mainW.browserApp->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
+    //QtWebEngine::initialize();
+    //    QQmlApplicationEngine appEngine;
+    //    Utils utils;
+    //    appEngine.rootContext()->setContextProperty("utils", &utils);
+    //    appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
+    //    QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
     return app.exec();
 }

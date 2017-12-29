@@ -25,7 +25,9 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    std::unique_ptr<QQmlApplicationEngine> browserApp;
     ~MainWindow();
+
 private slots:
     void on_newSite_clicked();
     void on_newList_clicked();
@@ -37,7 +39,7 @@ protected:
     void dropEvent(QDropEvent *e);
 private:
     typedef QWidget super;
-    std::unique_ptr<QQmlApplicationEngine> browser;
+//    QQmlApplicationEngine* browserApp;
     QUrl startupUrl(QString* url = nullptr);
     bool isLeftClick;
     Ui::MainWindow *ui;

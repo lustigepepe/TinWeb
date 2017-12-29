@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+//    if(browserApp)
+//        delete browserApp;
     if (mainXml)
         delete mainXml;
     qDebug() << " Destroy MainWindow !!--" << endl;
@@ -107,14 +109,23 @@ QUrl MainWindow::startupUrl(QString* url)
 
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
-    if(!Browser::IsRuning)
-    {
-        Browser::instance()->createBrowser();
-    }
-    else
-    {
-        // Browser::browser;
-    }
+//    if(!Browser::IsRuning)
+//    {
+//        Browser::instance()->createBrowser();
+//    }
+//    else
+//    {
+//        // Browser::browser;
+//    }
+//    QtWebEngine::initialize();
+//    browserApp = new QQmlApplicationEngine();
+//    Utils utils;
+//    browserApp->rootContext()->setContextProperty("utils", &utils);
+//    browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
+//    QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
+
+        browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
+        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
 }
 
 void MainWindow::on_ItemInList_doubleClicked(const QModelIndex &index)
@@ -140,8 +151,7 @@ void MainWindow::dropEvent(QDropEvent *e)
 
 void Browser::createBrowser()
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QtWebEngine::initialize();
     browser = std::make_unique<QQmlApplicationEngine>();
     Utils utils;
     browser->rootContext()->setContextProperty("utils", &utils);
