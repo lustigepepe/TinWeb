@@ -27,6 +27,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     std::unique_ptr<QQmlApplicationEngine> browserApp;
     ~MainWindow();
+    bool IsRuning = false;
 
 private slots:
     void on_newSite_clicked();

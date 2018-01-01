@@ -16,7 +16,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlContext>
 #include <QtWebEngine/qtwebengineglobal.h>
-
+#include <QQuickItem>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -109,23 +109,17 @@ QUrl MainWindow::startupUrl(QString* url)
 
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
-//    if(!Browser::IsRuning)
-//    {
-//        Browser::instance()->createBrowser();
-//    }
-//    else
-//    {
-//        // Browser::browser;
-//    }
-//    QtWebEngine::initialize();
-//    browserApp = new QQmlApplicationEngine();
-//    Utils utils;
-//    browserApp->rootContext()->setContextProperty("utils", &utils);
-//    browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
-//    QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
-
+    if(IsRuning)
+    {
+        QMetaObject::invokeMethod(browserApp->rootObjects().
+                                  first()->findChild<QObject*>("browserWindow"),"createTab",  Q_ARG(QVariant, startupUrl()));
+    }
+    else
+    {
         browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
         QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
+        IsRuning = true;
+    }
 }
 
 void MainWindow::on_ItemInList_doubleClicked(const QModelIndex &index)

@@ -61,6 +61,7 @@ import QtWebEngine 1.3
 
 ApplicationWindow {
     id: browserWindow
+    objectName: "browserWindow"
     property QtObject applicationRoot
     property Item currentWebView: tabs.currentIndex < tabs.count ? tabs.getTab(tabs.currentIndex).item : null
     property int previousVisibility: Window.Windowed
@@ -88,7 +89,13 @@ ApplicationWindow {
         property alias autoLoadIconsForPage: autoLoadIconsForPage.checked
         property alias touchIconsEnabled: touchIconsEnabled.checked
     }
-
+    function createTab(url) {
+        tabs.createEmptyTab(currentWebView.profile);
+        tabs.currentIndex = tabs.count - 1;
+        addressBar.forceActiveFocus();
+        addressBar.selectAll();
+        currentWebView.url = url;
+    }
     Action {
         shortcut: "Ctrl+D"
         onTriggered: {
