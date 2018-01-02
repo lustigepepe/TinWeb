@@ -41,12 +41,16 @@ void MainWindow::on_newSite_clicked()
     // rechtsklick -> edit
 
     mainXml = new XMlLibrary();
-    QString path("schnick/schnack");
+    QString pathT("schnick/schnack");
     QString name("schnickMan");
 
-    mainXml->readWriteXML(&path, false, &name);
+    mainXml->readWriteXML(&pathT, false, &name);
     QFileInfo info( QFileDialog::getOpenFileName(this));
-    QString base = info.baseName();
+    QString item = info.baseName();
+    QString path = info.absoluteFilePath();
+    qDebug() << "Item"<< item << " -|- " << path;
+    mainXml->readWriteXML(&path, false, &item);
+
     QStringList list;
     list << "Clair de Lune" << "Reverie" << "Prelude";
     if (mainXml && !mainXml->xmlVec->empty())
@@ -76,20 +80,6 @@ void MainWindow::on_newList_clicked()
 
 void MainWindow::on_overView_clicked()
 {
-}
-QUrl Browser::startupUrl(QString* url)
-{
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
-    }
-    return QUrl((url ?  *url : "http://qt.io/"));
 }
 
 QUrl MainWindow::startupUrl(QString* url)
@@ -123,34 +113,28 @@ bool MainWindow::filterXMLData(QString &name, QUrl& url)
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
     QUrl url;
-    QString string (index.data().toString());
+    QString titel (index.data().toString());
+    filterXMLData(titel, url);
+
     if(IsRuning)
     {
-        filterXMLData(string, url);
-
-        //        QMetaObject::invokeMethod(browserApp->rootObjects().
-        //                                  first()->findChild<QObject*>("browserWindow"),"createTab",
-        //                                  Q_ARG(QVariant, url);
-
         QMetaObject::invokeMethod(browserApp->rootObjects().
                                   first()->findChild<QObject*>("browserWindow"),"createTab",
-                                  Q_ARG(QVariant, startupUrl()));
+                                  Q_ARG(QVariant, url));
+        //        QMetaObject::invokeMethod(browserApp->rootObjects().
+        //                                  first()->findChild<QObject*>("browserWindow"),"createTab",
+        //                                  Q_ARG(QVariant, startupUrl()));
     }
     else
     {
-
-        filterXMLData(string, url);
-
-
         browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
-        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
-                                  Q_ARG(QVariant, startupUrl()));
-
         //        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
-        //                                  Q_ARG(QVariant, url);
-        qDebug() << string << " " << url;
+        //                                  Q_ARG(QVariant, startupUrl()));
+        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
+                                  Q_ARG(QVariant, url));
         IsRuning = true;
     }
+    qDebug() << titel << " " << url;
 }
 
 void MainWindow::on_ItemInList_doubleClicked(const QModelIndex &index)
@@ -181,5 +165,5 @@ void Browser::createBrowser()
     Utils utils;
     browser->rootContext()->setContextProperty("utils", &utils);
     browser->load(QUrl("qrc:/ApplicationRoot.qml"));
-    QMetaObject::invokeMethod(browser->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
+    //    QMetaObject::invokeMethod(browser->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
 }

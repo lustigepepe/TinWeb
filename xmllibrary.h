@@ -16,9 +16,10 @@ public:
     void readWriteXML(QString* path = nullptr, bool list = false, QString* name = nullptr);
     std::unique_ptr<std::vector<xmlData*>> xmlVec;
 private:
-    void creatDoc(QDomElement& docFirst ,QString* path, bool list, QString* name);
+    void creatDoc(QString* path, bool list, QString* name);
     void parseString(QString& line);
     QFile* xmlFile;
+    QDomElement lastElement;
 };
 
 struct xmlData
