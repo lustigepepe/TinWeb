@@ -128,9 +128,9 @@ void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
     {
         filterXMLData(string, url);
 
-//        QMetaObject::invokeMethod(browserApp->rootObjects().
-//                                  first()->findChild<QObject*>("browserWindow"),"createTab",
-//                                  Q_ARG(QVariant, url);
+        //        QMetaObject::invokeMethod(browserApp->rootObjects().
+        //                                  first()->findChild<QObject*>("browserWindow"),"createTab",
+        //                                  Q_ARG(QVariant, url);
 
         QMetaObject::invokeMethod(browserApp->rootObjects().
                                   first()->findChild<QObject*>("browserWindow"),"createTab",
@@ -140,15 +140,15 @@ void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
     {
 
         filterXMLData(string, url);
-        qDebug() << string << " " << url;
 
 
         browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
         QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
                                   Q_ARG(QVariant, startupUrl()));
 
-//        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
-//                                  Q_ARG(QVariant, url);
+        //        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
+        //                                  Q_ARG(QVariant, url);
+        qDebug() << string << " " << url;
         IsRuning = true;
     }
 }
