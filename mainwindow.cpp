@@ -44,7 +44,7 @@ void MainWindow::on_newSite_clicked()
     QString path("schnick/schnack");
     QString name("schnickMan");
 
-    mainXml->readWriteSite(&path, false, &name);
+    mainXml->readWriteXML(&path, false, &name);
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString base = info.baseName();
     QStringList list;
@@ -107,17 +107,48 @@ QUrl MainWindow::startupUrl(QString* url)
     return QUrl((url ?  *url : "http://qt.io/"));
 }
 
+bool MainWindow::filterXMLData(QString &name, QUrl& url)
+{
+    for(auto& x :  *mainXml->xmlVec)
+    {
+        if(name == x->name)
+        {
+            url = startupUrl(&x->url);
+            return x->list;
+        }
+    }
+    return false;
+}
+
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
+    QUrl url;
+    QString string (index.data().toString());
     if(IsRuning)
     {
+        filterXMLData(string, url);
+
+//        QMetaObject::invokeMethod(browserApp->rootObjects().
+//                                  first()->findChild<QObject*>("browserWindow"),"createTab",
+//                                  Q_ARG(QVariant, url);
+
         QMetaObject::invokeMethod(browserApp->rootObjects().
-                                  first()->findChild<QObject*>("browserWindow"),"createTab",  Q_ARG(QVariant, startupUrl()));
+                                  first()->findChild<QObject*>("browserWindow"),"createTab",
+                                  Q_ARG(QVariant, startupUrl()));
     }
     else
     {
+
+        filterXMLData(string, url);
+        qDebug() << string << " " << url;
+
+
         browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
-        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
+        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
+                                  Q_ARG(QVariant, startupUrl()));
+
+//        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
+//                                  Q_ARG(QVariant, url);
         IsRuning = true;
     }
 }

@@ -13,7 +13,7 @@ class XMlLibrary
 public:
     XMlLibrary(QString* path = nullptr);
     ~XMlLibrary();
-    void readWriteSite(QString* path = nullptr, bool list = false, QString* name = nullptr);
+    void readWriteXML(QString* path = nullptr, bool list = false, QString* name = nullptr);
     std::unique_ptr<std::vector<xmlData*>> xmlVec;
 private:
     void creatDoc(QDomElement& docFirst ,QString* path, bool list, QString* name);

@@ -29,7 +29,7 @@ XMlLibrary::~XMlLibrary()
     }
 }
 
-void XMlLibrary::readWriteSite(QString* path, bool list, QString* name)
+void XMlLibrary::readWriteXML(QString* path, bool list, QString* name)
 {
     QDomDocument doc;
     if (!xmlFile->open(QIODevice::ReadWrite))

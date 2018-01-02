@@ -47,6 +47,7 @@ private:
     Document m_content;
     QStringListModel *listViewModel;
     XMlLibrary* mainXml;
+    bool filterXMLData(QString& name, QUrl& url);
 };
 
 class Browser : public Singleton<Browser>
