@@ -48,6 +48,7 @@ private:
     QStringListModel *listViewModel;
     XMlLibrary* mainXml;
     bool filterXMLData(QString& name, QUrl& url);
+    QStringList fillOverviewList();
 };
 
 class Browser : public Singleton<Browser>
@@ -55,7 +56,6 @@ class Browser : public Singleton<Browser>
 public:
     friend class Singleton;
     void createBrowser();
-    QUrl startupUrl(QString* url = nullptr);
     std::unique_ptr<QQmlApplicationEngine> browser;
 private:
     Browser()=default;

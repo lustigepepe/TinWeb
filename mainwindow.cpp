@@ -22,7 +22,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    mainXml = new XMlLibrary();
     listViewModel = new QStringListModel(this);
+    QStringList list = fillOverviewList();
+    if(!list.empty())
+        listViewModel->setStringList(list);
+    ui->ItemInList->setModel(listViewModel);
 }
 
 MainWindow::~MainWindow()
@@ -40,7 +45,6 @@ void MainWindow::on_newSite_clicked()
     // neue seite öffnen um dann eine seite angeben die in der liste erscheint
     // rechtsklick -> edit
 
-    mainXml = new XMlLibrary();
     QString pathT("schnick/schnack");
     QString name("schnickMan");
 
@@ -51,25 +55,10 @@ void MainWindow::on_newSite_clicked()
     qDebug() << "Item"<< item << " -|- " << path;
     mainXml->readWriteXML(&path, false, &item);
 
-    QStringList list;
-    list << "Clair de Lune" << "Reverie" << "Prelude";
-    if (mainXml && !mainXml->xmlVec->empty())
-    {
-        for(auto &x : *mainXml->xmlVec)
-            list << x->name;
-    }
-    // Populate our model
+    QStringList list = fillOverviewList();
+    list << "----------------------"
+            "" << "Reverie" << "Prelude";
     listViewModel->setStringList(list);
-    ui->ItemInList->setModel(listViewModel);
-    //    // Glue model and view together
-    //    ui->listView->setModel(model);
-//    ui->comboBox->setModel(model);
-//    // Add additional feature so that
-//    // we can manually modify the data in ListView
-//    // It may be triggered by hitting any key or double-click etc.
-//    ui->listView->
-//            setEditTriggers(QAbstractItemView::AnyKeyPressed |
-//                            QAbstractItemView::DoubleClicked);
 
 }
 
@@ -108,6 +97,18 @@ bool MainWindow::filterXMLData(QString &name, QUrl& url)
         }
     }
     return false;
+}
+
+QStringList MainWindow::fillOverviewList()
+{
+    mainXml->readWriteXML();
+    QStringList list;
+    if (mainXml && !mainXml->xmlVec->empty())
+    {
+        for(auto &x : *mainXml->xmlVec)
+            list << x->name;
+    }
+    return list;
 }
 
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)

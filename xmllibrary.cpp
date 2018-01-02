@@ -3,7 +3,7 @@
 #include <QDir>
 #include <QString>
 #include <QCoreApplication>
-#include <qDebug>
+#include <QDebug>
 
 XMlLibrary::XMlLibrary(QString* path)
     : xmlVec(new std::vector<xmlData*>)
