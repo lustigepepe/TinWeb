@@ -49,6 +49,7 @@ private:
     XMlLibrary* mainXml;
     bool filterXMLData(QString& name, QUrl& url);
     QStringList fillOverviewList();
+    bool desc = false;
 };
 
 class Browser : public Singleton<Browser>
