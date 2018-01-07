@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     if(!list.empty())
         listViewModel->setStringList(list);
     ui->ItemInList->setModel(listViewModel);
-
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +105,7 @@ void convertWebarchiveToHtml(xmlData* data)
     }
 
     QProcess *proc = new QProcess();
-    if(info.completeSuffix() == "webarchive" && ! QFile(newFile).exists())
+    if(!QFile(newFile).exists())
     {
 
         if(!QDir(newFolder).exists())
@@ -137,27 +136,28 @@ bool MainWindow::filterXMLData(QString &name, QUrl& url)
     {
         if(name == x->name)
         {
-            if(!desc)
+            QFileInfo info(x->url);
+            if(!desc || !(info.completeSuffix() == "webarchive"))
             {
                 url = startupUrl(&x->url);
             }
             else
             {
-
                 bool unix = QSysInfo::productType() == "winrt" ? false : true;
-                QFileInfo info(x->url);
-                if(unix)
+                if(info.completeSuffix() == "webarchive")
                 {
-                    x->url = info.canonicalPath()+"/NoWebArchive" + "/" + name + ".html";
-                }
-                else
-                {
-                    x->url = info.canonicalPath()+"\\NoWebArchive" + "\\" + name + ".html";
-
+                    if(unix)
+                    {
+                        x->url = info.canonicalPath()+"/NoWebArchive" + "/" + name + ".html";
+                    }
+                    else
+                    {
+                        x->url = info.canonicalPath()+ "\\NoWebArchive" + "\\" + name + ".html";
+                    }
                 }
                 url = startupUrl(&x->url);
-                url.setScheme("file");
             }
+            url.setScheme("file");
             return x->list;
         }
     }
@@ -173,7 +173,8 @@ QStringList MainWindow::fillOverviewList()
         for(auto &x : *mainXml->xmlVec)
         {
             list << x->name;
-            if(desc)
+            QFileInfo info(x->url);
+            if(info.completeSuffix() == "webarchive" && desc)
                 convertWebarchiveToHtml(x);
         }
     }
@@ -185,9 +186,10 @@ void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
     QUrl url;
     QString titel (index.data().toString());
     filterXMLData(titel, url);
+    QFileInfo info(url.toString());
     if(IsRuning)
     {
-        if(!desc)
+        if(!desc && info.completeSuffix() == "webarchive")
         {
             QDesktopServices::openUrl(url);
         }
@@ -203,8 +205,7 @@ void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
     }
     else
     {
-        url.setScheme("file");
-        if(!desc)
+        if(!desc && info.completeSuffix() == "webarchive")
         {
             QDesktopServices::openUrl(url);
         }
