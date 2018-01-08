@@ -65,12 +65,11 @@ void XMlLibrary::readWriteXML(QString* path, bool list, QString* name)
                xmlVec->push_back(temp);
            }
        }
-        n = n.nextSibling();
+       n = n.nextSibling();
     }
     if(n.toElement().tagName() == "")
     {
-        if(!lastElement.isElement())
-            lastElement = rootDocElem;
+        lastElement = rootDocElem;
         if(path)
         {
             creatDoc(path, list, name);

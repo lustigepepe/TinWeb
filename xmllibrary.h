@@ -20,6 +20,8 @@ private:
     void parseString(QString& line);
     QFile* xmlFile;
     QDomElement lastElement;
+    QDomDocument doc;
+
 };
 
 struct xmlData

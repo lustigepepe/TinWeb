@@ -46,10 +46,10 @@ void MainWindow::on_newSite_clicked()
     // neue seite öffnen um dann eine seite angeben die in der liste erscheint
     // rechtsklick -> edit
 
-    QString pathT("schnick/schnack");
-    QString name("schnickMan");
+//    QString pathT("schnick/schnack");
+//    QString name("schnickMan");
 
-    mainXml->readWriteXML(&pathT, false, &name);
+//    mainXml->readWriteXML(&pathT, false, &name);
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString item = info.baseName();
     QString path = info.absoluteFilePath();
@@ -57,10 +57,9 @@ void MainWindow::on_newSite_clicked()
     mainXml->readWriteXML(&path, false, &item);
 
     QStringList list = fillOverviewList();
-    list << "----------------------"
-            "" << "Reverie" << "Prelude";
+//    list << "----------------------"
+//            "" << "Reverie" << "Prelude";
     listViewModel->setStringList(list);
-
 }
 
 void MainWindow::on_newList_clicked()
