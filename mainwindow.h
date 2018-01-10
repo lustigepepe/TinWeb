@@ -48,7 +48,7 @@ private:
     QStringListModel *listViewModel;
     XMlLibrary* mainXml;
     bool filterXMLData(QString& name, QUrl& url);
-    QStringList fillOverviewList();
+    QStringList fillOverviewList(QStringList& list);
     bool desc = false;
 };
 

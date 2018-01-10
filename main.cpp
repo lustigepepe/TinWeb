@@ -63,6 +63,12 @@ typedef QGuiApplication Application;
 #include <QtWebEngine/qtwebengineglobal.h>
 #include <QWebEngineView>
 
+// later Important Steps -> convert webarchive wenn
+// file was added new and app is still running
+
+// dellete all another file than html from Nowebarchive dir
+// -> bool QFile::remove(const QString &fileName)
+// -> QFileInfoList QDir::entryInfoList
 
 QUrl startupUrl(QString* url = nullptr)
 {

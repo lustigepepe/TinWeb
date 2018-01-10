@@ -25,9 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     desc = QSysInfo::productType() == "winrt" || "osx" ? true : false;
     mainXml = new XMlLibrary();
     listViewModel = new QStringListModel(this);
-    QStringList list = fillOverviewList();
-    if(!list.empty())
-        listViewModel->setStringList(list);
+    QStringList list;
+    listViewModel->setStringList(fillOverviewList(list));
     ui->ItemInList->setModel(listViewModel);
 }
 
@@ -46,25 +45,28 @@ void MainWindow::on_newSite_clicked()
     // neue seite öffnen um dann eine seite angeben die in der liste erscheint
     // rechtsklick -> edit
 
-//    QString pathT("schnick/schnack");
-//    QString name("schnickMan");
-
-//    mainXml->readWriteXML(&pathT, false, &name);
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString item = info.baseName();
     QString path = info.absoluteFilePath();
     qDebug() << "Item"<< item << " -|- " << path;
-    mainXml->readWriteXML(&path, false, &item);
-
-    QStringList list = fillOverviewList();
-//    list << "----------------------"
-//            "" << "Reverie" << "Prelude";
-    listViewModel->setStringList(list);
+    mainXml->readXML(&path, &item);
+    listViewModel->setStringList(fillOverviewList(listViewModel->stringList());
 }
 
 void MainWindow::on_newList_clicked()
 {
+//    QFileInfo info( QFileDialog::getOpenFileName(this));
+//    QString item = info.baseName();
+//    QString path = info.absoluteFilePath();
+//    qDebug() << "Item"<< item << " -|- " << path;
+//    mainXml->readXML(&path, &item);
 
+//    QStringList list = fillOverviewList();
+//    list << "----------------------"
+//            "" << "Reverie" << "Prelude";
+    QStringList list = listViewModel->stringList();
+    list << "enter your list name";
+    listViewModel->setStringList(list);
 }
 
 void MainWindow::on_overView_clicked()
@@ -157,16 +159,15 @@ bool MainWindow::filterXMLData(QString &name, QUrl& url)
                 url = startupUrl(&x->url);
             }
             url.setScheme("file");
-            return x->list;
+            return x->list.size() > 1 ? true : false;
         }
     }
     return false;
 }
 
-QStringList MainWindow::fillOverviewList()
+QStringList MainWindow::fillOverviewList(QStringList& list)
 {
-    mainXml->readWriteXML();
-    QStringList list;
+    mainXml->readXML();
     if (mainXml && !mainXml->xmlVec->empty())
     {
         for(auto &x : *mainXml->xmlVec)

@@ -4,7 +4,7 @@
 #include <QString>
 #include <QCoreApplication>
 #include <QDebug>
-
+#include <QDomProcessingInstruction>
 XMlLibrary::XMlLibrary(QString* path)
     : xmlVec(new std::vector<xmlData*>)
 {
@@ -20,6 +20,7 @@ XMlLibrary::XMlLibrary(QString* path)
 
 XMlLibrary::~XMlLibrary()
 {
+    writeXML();
     if (xmlFile)
         delete xmlFile;
     if (xmlVec)
@@ -29,7 +30,7 @@ XMlLibrary::~XMlLibrary()
     }
 }
 
-void XMlLibrary::readWriteXML(QString* path, bool list, QString* name)
+void XMlLibrary::readXML(QString* path, QString* list, QString* name)
 {
     QDomDocument doc;
     if (!xmlFile->open(QIODevice::ReadWrite))
@@ -53,70 +54,65 @@ void XMlLibrary::readWriteXML(QString* path, bool list, QString* name)
            {
                wasContent = true;
                QDomElement urlT = e.firstChildElement("url");
-               QDomElement listT = e.firstChildElement("list");
                QDomElement nameT = e.firstChildElement("name");
                xmlData* temp = new xmlData();
                if(!urlT.isNull())
                    temp->url = urlT.text();
-               if(!listT.isNull())
-                   temp->list = listT.text() == "true" || listT.text() == "True";
                if(!nameT.isNull())
                    temp->name = nameT.text();
+               for(QDomNode listNode = e.firstChild();!listNode.isNull();
+                   listNode = listNode.nextSibling())
+               {
+                   if (listNode.toElement().tagName() == "list")
+                      temp->list.push_back(listNode.toElement().text());
+               }
                xmlVec->push_back(temp);
            }
        }
        n = n.nextSibling();
     }
-    if(n.toElement().tagName() == "")
-    {
-        lastElement = rootDocElem;
-        if(path)
-        {
-            creatDoc(path, list, name);
-            if (!xmlFile->open(QIODevice::WriteOnly | QFile::Text))
-            {
-                qDebug() << "Error writing to XML";
-                xmlFile->close();
-                return;
-            }
-            QTextStream output(xmlFile);
-            output << doc.toString();
-            xmlFile->close();
-        }
-    }
 }
-
-void XMlLibrary::creatDoc(QString* path, bool list, QString* name)
+void XMlLibrary::writeXML()
 {
-    QDomDocument doc = lastElement.toDocument();
-    QDomElement item = doc.createElement("item");
-    QDomElement urlE = doc.createElement("url");
-    QDomElement listE = doc.createElement("list");
-    QDomElement nameE = doc.createElement("name");
-    if(path)
+    if (!xmlFile->open(QIODevice::WriteOnly | QFile::Text))
     {
-        QDomText urlText = doc.createTextNode(*path);
-        urlE.appendChild(urlText);
+        qDebug() << "Error writing to XML";
+        xmlFile->close();
+        return;
     }
-    QDomText listText = doc.createTextNode(list? "true":"false");
-    listE.appendChild(listText);
-    if(name)
-    {
-        QDomText nameText = doc.createTextNode(*name);
-        nameE.appendChild(nameText);
-    }
-    item.appendChild(urlE);
-    item.appendChild(listE);
-    item.appendChild(nameE);
-    lastElement.appendChild(item);
+    QDomDocument doc;
+    QDomProcessingInstruction proIn = doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\"");
+    doc.appendChild(proIn);
 
-    xmlData* temp = new xmlData();
-    if(!urlE.isNull())
-        temp->url = urlE.text();
-    if(!listE.isNull())
-        temp->list = listE.text() == "true" || listE.text() == "True";
-    if(!nameE.isNull())
-        temp->name = nameE.text();
-    xmlVec->push_back(temp);
+    QDomElement mainTag = doc.createElement("mainXml");
+    for(auto& data : *xmlVec)
+    {
+        QDomElement item = doc.createElement("item");
+        QDomElement urlE = doc.createElement("url");
+        QDomElement nameE = doc.createElement("name");
+        QDomText urlText = doc.createTextNode(data->url);
+        urlE.appendChild(urlText);
+        QDomText nameText = doc.createTextNode(data->name);
+        nameE.appendChild(nameText);
+        item.appendChild(urlE);
+        item.appendChild(nameE);
+
+        if (!data->list.empty())
+        {
+            for(auto record : data->list)
+            {
+                QDomElement listE = doc.createElement("list");
+                QDomText listText = doc.createTextNode(record);
+                listE.appendChild(listText);
+                item.appendChild(listE);
+            }
+        }
+        mainTag.appendChild(item);
+    }
+    doc.appendChild(mainTag);
+
+    QTextStream output(xmlFile);
+    output << doc.toString();
+    xmlFile->close();
 }
 
