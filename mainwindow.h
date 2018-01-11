@@ -28,6 +28,8 @@ public:
     std::unique_ptr<QQmlApplicationEngine> browserApp;
     ~MainWindow();
     bool IsRuning = false;
+    QStringListModel *listViewModel;
+    XMlLibrary* mainXml;
 
 private slots:
     void on_newSite_clicked();
@@ -45,11 +47,10 @@ private:
     bool isLeftClick;
     Ui::MainWindow *ui;
     Document m_content;
-    QStringListModel *listViewModel;
-    XMlLibrary* mainXml;
-    bool filterXMLData(QString& name, QUrl& url);
+    bool filterXMLData(QString& name, std::vector<QUrl>& url);
     QStringList fillOverviewList(QStringList& list);
     bool desc = false;
+    std::vector<QModelIndex> wasModified;
 };
 
 class Browser : public Singleton<Browser>

@@ -17,6 +17,8 @@
 #include <QtQml/QQmlContext>
 #include <QtWebEngine/qtwebengineglobal.h>
 #include <QQuickItem>
+#include "helperwindow.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -32,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    updateName(wasModified, listViewModel, mainXml);
     delete ui;
 //    if(browserApp)
 //        delete browserApp;
@@ -45,28 +48,32 @@ void MainWindow::on_newSite_clicked()
     // neue seite öffnen um dann eine seite angeben die in der liste erscheint
     // rechtsklick -> edit
 
-    QFileInfo info( QFileDialog::getOpenFileName(this));
-    QString item = info.baseName();
-    QString path = info.absoluteFilePath();
-    qDebug() << "Item"<< item << " -|- " << path;
-    mainXml->readXML(&path, &item);
-    listViewModel->setStringList(fillOverviewList(listViewModel->stringList());
-}
-
-void MainWindow::on_newList_clicked()
-{
 //    QFileInfo info( QFileDialog::getOpenFileName(this));
 //    QString item = info.baseName();
 //    QString path = info.absoluteFilePath();
 //    qDebug() << "Item"<< item << " -|- " << path;
 //    mainXml->readXML(&path, &item);
+//    QStringList list = listViewModel->stringList();
+//    listViewModel->setStringList(fillOverviewList(list));
+}
 
-//    QStringList list = fillOverviewList();
-//    list << "----------------------"
-//            "" << "Reverie" << "Prelude";
-    QStringList list = listViewModel->stringList();
-    list << "enter your list name";
-    listViewModel->setStringList(list);
+void MainWindow::on_newList_clicked()
+{
+
+//        QFileInfo info( QFileDialog::getOpenFileName(this));
+//        QString item = info.baseName();
+//        QString path = info.absoluteFilePath();
+//        qDebug() << "Item"<< item << " -|- " << path;
+//        mainXml->readXML(&path, &item);
+//        QStringList list = listViewModel->stringList();
+//        list << "List: "+ item;
+//        listViewModel->setStringList(fillOverviewList(list));
+//        xmlData* temp = new xmlData();
+//        if(!path.isNull())
+//            temp->url = path;
+//        if(!item.isNull())
+//            temp->name = item;
+//        mainXml->xmlVec->push_back(temp);
 }
 
 void MainWindow::on_overView_clicked()
@@ -89,77 +96,89 @@ QUrl MainWindow::startupUrl(QString* url)
 
 }
 
-void convertWebarchiveToHtml(xmlData* data)
+void convertWebarchiveToHtml(xmlData* data, bool desc)
 {
-    QFileInfo info(data->url);
-    bool unix = QSysInfo::productType() == "winrt" ? false : true;
-    QString newFolder, newFile;
-    if(unix)
+    for (auto& url : data->url)
     {
-        newFolder = (info.canonicalPath()+"/NoWebArchive");
-        newFile = newFolder + "/" + data->name + ".html";
-    }
-    else
-    {
-        newFolder = (info.canonicalPath()+"\\NoWebArchive");
-        newFile = newFolder + "\\"+ data->name + ".html";
-    }
-
-    QProcess *proc = new QProcess();
-    if(!QFile(newFile).exists())
-    {
-
-        if(!QDir(newFolder).exists())
-            QDir().mkdir(newFolder);
-
-        QString program;
-        QStringList arguments;
-        if(unix)
+        QFileInfo info(url);
+        if(info.completeSuffix() == "webarchive" && desc)
         {
-            program = "/usr/bin/textutil";
-            arguments << "-convert"  << "html" << data->url
-                      << "-output" << newFile;
+            bool unix = QSysInfo::productType() == "winrt" ? false : true;
+            QString newFolder, newFile;
+            if(unix)
+            {
+                newFolder = (info.canonicalPath()+"/NoWebArchive");
+                newFile = newFolder + "/" + data->name + ".html";
+            }
+            else
+            {
+                newFolder = (info.canonicalPath()+"\\NoWebArchive");
+                newFile = newFolder + "\\"+ data->name + ".html";
+            }
+
+            QProcess *proc = new QProcess();
+            if(!QFile(newFile).exists())
+            {
+
+                if(!QDir(newFolder).exists())
+                    QDir().mkdir(newFolder);
+
+                QString program;
+                QStringList arguments;
+                if(unix)
+                {
+                    program = "/usr/bin/textutil";
+                    arguments << "-convert"  << "html" << url
+                              << "-output" << newFile;
+                }
+                else
+                {
+                    program = "C:\Windows\SysWOW64\textutil";
+                    arguments << "-convert"  << "html" << url
+                              << "-output" << newFile;
+                }
+
+                proc->start(program, arguments);
+                proc->closeWriteChannel();
+            }
         }
-        else
-        {
-            program = "C:\Windows\SysWOW64\textutil";
-            arguments << "-convert"  << "html" << data->url
-                      << "-output" << newFile;
-        }
-        proc->start(program, arguments);
-        proc->closeWriteChannel();
     }
 }
 
-bool MainWindow::filterXMLData(QString &name, QUrl& url)
+bool MainWindow::filterXMLData(QString &name, std::vector<QUrl>& url)
 {
     for(auto& x :  *mainXml->xmlVec)
     {
         if(name == x->name)
         {
-            QFileInfo info(x->url);
-            if(!desc || !(info.completeSuffix() == "webarchive"))
+            for(auto& urlLoop : x->url)
             {
-                url = startupUrl(&x->url);
-            }
-            else
-            {
-                bool unix = QSysInfo::productType() == "winrt" ? false : true;
-                if(info.completeSuffix() == "webarchive")
+                QUrl ur;
+                QFileInfo info(urlLoop);
+                if(!desc || !(info.completeSuffix() == "webarchive"))
                 {
-                    if(unix)
-                    {
-                        x->url = info.canonicalPath()+"/NoWebArchive" + "/" + name + ".html";
-                    }
-                    else
-                    {
-                        x->url = info.canonicalPath()+ "\\NoWebArchive" + "\\" + name + ".html";
-                    }
+                    ur = startupUrl(&urlLoop);
                 }
-                url = startupUrl(&x->url);
+                else
+                {
+                    bool unix = QSysInfo::productType() == "winrt" ? false : true;
+                    if(info.completeSuffix() == "webarchive")
+                    {
+                        if(unix)
+                        {
+                            urlLoop = info.canonicalPath()+"/NoWebArchive" + "/" + name + ".html";
+                        }
+                        else
+                        {
+                            urlLoop = info.canonicalPath()+ "\\NoWebArchive" + "\\" + name + ".html";
+                        }
+                    }
+                    ur = startupUrl(&urlLoop);
+                }
+                ur.setScheme("file");
+                url.push_back(ur);
             }
-            url.setScheme("file");
-            return x->list.size() > 1 ? true : false;
+            return x->url.size() > 1 ? true : false;
         }
     }
     return false;
@@ -173,9 +192,12 @@ QStringList MainWindow::fillOverviewList(QStringList& list)
         for(auto &x : *mainXml->xmlVec)
         {
             list << x->name;
-            QFileInfo info(x->url);
-            if(info.completeSuffix() == "webarchive" && desc)
-                convertWebarchiveToHtml(x);
+//            for(auto& xUr : x->url)
+//            {
+                //                QFileInfo info(xUr);
+                //                if(info.completeSuffix() == "webarchive" && desc)
+                convertWebarchiveToHtml(x, desc);
+//            }
         }
     }
     return list;
@@ -183,48 +205,67 @@ QStringList MainWindow::fillOverviewList(QStringList& list)
 
 void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
-    QUrl url;
-    QString titel (index.data().toString());
-    filterXMLData(titel, url);
-    QFileInfo info(url.toString());
-    if(IsRuning)
+
+    QString titel = index.data().toString();
+    bool update = updateName(wasModified, listViewModel, mainXml);
+    if(!titel.startsWith("List") && update)
+        titel = "List: "+ titel;
+    std::vector<QUrl> urlVec;
+    filterXMLData(titel, urlVec);
+    for(auto& url : urlVec)
     {
-        if(!desc && info.completeSuffix() == "webarchive")
+        QFileInfo info(url.toString());
+        if(IsRuning)
         {
-            QDesktopServices::openUrl(url);
+            if(!desc && info.completeSuffix() == "webarchive")
+            {
+                QDesktopServices::openUrl(url);
+            }
+            else
+            {
+                QMetaObject::invokeMethod(browserApp->rootObjects().
+                                          first()->findChild<QObject*>("browserWindow"),"createTab",
+                                          Q_ARG(QVariant, url));
+            }
+            //        QMetaObject::invokeMethod(browserApp->rootObjects().
+            //                                  first()->findChild<QObject*>("browserWindow"),"createTab",
+            //                                  Q_ARG(QVariant, startupUrl()));
         }
         else
         {
-            QMetaObject::invokeMethod(browserApp->rootObjects().
-                                      first()->findChild<QObject*>("browserWindow"),"createTab",
-                                      Q_ARG(QVariant, url));
+            if(!desc && info.completeSuffix() == "webarchive")
+            {
+                QDesktopServices::openUrl(url);
+            }
+            else
+            {
+                browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
+                QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
+                                          Q_ARG(QVariant, url));
+            }
+            IsRuning = true;
         }
-        //        QMetaObject::invokeMethod(browserApp->rootObjects().
-        //                                  first()->findChild<QObject*>("browserWindow"),"createTab",
-        //                                  Q_ARG(QVariant, startupUrl()));
+        qDebug() << titel << " " << url;
+        qDebug() <<" ----------------------------";
     }
-    else
-    {
-        if(!desc && info.completeSuffix() == "webarchive")
-        {
-            QDesktopServices::openUrl(url);
-        }
-        else
-        {
-            browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
-            QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
-                                      Q_ARG(QVariant, url));
-        }
-        IsRuning = true;
-    }
-    qDebug() << titel << " " << url;
 }
 
 void MainWindow::on_ItemInList_doubleClicked(const QModelIndex &index)
 {
+    wasModified.push_back(index);
 
+    QFileInfo info( QFileDialog::getOpenFileName(this));
+    QString item = info.baseName();
+    QString path = info.absoluteFilePath();
+    qDebug() << "Item"<< item << " -|- " << path;
 
+    QStringList list = listViewModel->stringList();
+    list << "List: "+ item;
 
+    if(!path.isNull())
+        mainXml->xmlVec->at(index.row())->url.push_back(path);
+    if(!item.isNull())
+        mainXml->xmlVec->at(index.row())->name = item;
 }
 
 void MainWindow::dropEvent(QDropEvent *e)

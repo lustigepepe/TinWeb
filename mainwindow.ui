@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>New Site</string>
+     <string>New Side</string>
     </property>
    </widget>
    <widget class="QPushButton" name="newList">
@@ -37,7 +37,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>New List</string>
+     <string>+ A Side</string>
     </property>
    </widget>
    <widget class="QListView" name="ItemInList">

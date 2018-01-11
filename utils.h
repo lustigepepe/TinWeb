@@ -66,5 +66,4 @@ inline QUrl Utils::fromUserInput(const QString& userInput)
         return QUrl::fromLocalFile(fileInfo.absoluteFilePath());
     return QUrl::fromUserInput(userInput);
 }
-
 #endif // UTILS_H

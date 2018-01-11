@@ -10,7 +10,8 @@ HEADERS += \
         previewpage.h \
         document.h \
         xmllibrary.h \
-        singleton.h
+        singleton.h \
+    helperWindow.h
 
 SOURCES += \
         main.cpp \

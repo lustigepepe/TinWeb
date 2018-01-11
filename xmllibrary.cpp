@@ -13,8 +13,8 @@ XMlLibrary::XMlLibrary(QString* path)
     else
     {
         QString current =  QDir::currentPath();
-        QStringList list = current.split(QFileInfo(QCoreApplication::applicationFilePath()).fileName());
-        xmlFile = new QFile(list.at(0)+QString("main.xml"));
+        QStringList url = current.split(QFileInfo(QCoreApplication::applicationFilePath()).fileName());
+        xmlFile = new QFile(url.at(0)+QString("main.xml"));
     }
 }
 
@@ -30,7 +30,7 @@ XMlLibrary::~XMlLibrary()
     }
 }
 
-void XMlLibrary::readXML(QString* path, QString* list, QString* name)
+void XMlLibrary::readXML(QString* path, QString* name)
 {
     QDomDocument doc;
     if (!xmlFile->open(QIODevice::ReadWrite))
@@ -40,7 +40,6 @@ void XMlLibrary::readXML(QString* path, QString* list, QString* name)
         return;
     }
     xmlFile->close();
-    bool wasContent = false;
     QDomElement rootDocElem = doc.documentElement();
     QDomNode n = rootDocElem.firstChild();
     if (!xmlVec && !n.isNull())
@@ -52,19 +51,15 @@ void XMlLibrary::readXML(QString* path, QString* list, QString* name)
        {
            if(!lastElement.isElement())
            {
-               wasContent = true;
-               QDomElement urlT = e.firstChildElement("url");
                QDomElement nameT = e.firstChildElement("name");
                xmlData* temp = new xmlData();
-               if(!urlT.isNull())
-                   temp->url = urlT.text();
                if(!nameT.isNull())
                    temp->name = nameT.text();
-               for(QDomNode listNode = e.firstChild();!listNode.isNull();
-                   listNode = listNode.nextSibling())
+               for(QDomNode urlNode = e.firstChild();!urlNode.isNull();
+                   urlNode = urlNode.nextSibling())
                {
-                   if (listNode.toElement().tagName() == "list")
-                      temp->list.push_back(listNode.toElement().text());
+                   if (urlNode.toElement().tagName() == "url")
+                      temp->url.push_back(urlNode.toElement().text());
                }
                xmlVec->push_back(temp);
            }
@@ -90,21 +85,21 @@ void XMlLibrary::writeXML()
         QDomElement item = doc.createElement("item");
         QDomElement urlE = doc.createElement("url");
         QDomElement nameE = doc.createElement("name");
-        QDomText urlText = doc.createTextNode(data->url);
-        urlE.appendChild(urlText);
+//        QDomText urlText = doc.createTextNode(data->url);
+//        urlE.appendChild(urlText);
         QDomText nameText = doc.createTextNode(data->name);
         nameE.appendChild(nameText);
-        item.appendChild(urlE);
+//        item.appendChild(urlE);
         item.appendChild(nameE);
 
-        if (!data->list.empty())
+        if (!data->url.empty())
         {
-            for(auto record : data->list)
+            for(auto record : data->url)
             {
-                QDomElement listE = doc.createElement("list");
-                QDomText listText = doc.createTextNode(record);
-                listE.appendChild(listText);
-                item.appendChild(listE);
+                QDomElement urlE = doc.createElement("url");
+                QDomText urlText = doc.createTextNode(record);
+                urlE.appendChild(urlText);
+                item.appendChild(urlE);
             }
         }
         mainTag.appendChild(item);
