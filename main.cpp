@@ -107,6 +107,13 @@ int main(int argc, char **argv)
     Application app(argc, argv);
     MainWindow mainW;
     mainW.show();
+//    QObject::connect(&mainW, &MainWindow::clicked, SLOT(on_ItemInList_clicked(const QModelIndex &index)));
+//    QObject::connect(&mainW, &MainWindow::doubleClicked, SLOT(on_ItemInList_doubleClicked(const QModelIndex &index)));
+
+//    QObject::connect(ui.tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(myCellClicked(int, int)));
+//    QObject::connect(ui.tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(tableItemClicked(int,int)));
+
+
     QtWebEngine::initialize();
     //    Test
     //   Browser::instance()->createBrowser();

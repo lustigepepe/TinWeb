@@ -11,7 +11,7 @@ HEADERS += \
         document.h \
         xmllibrary.h \
         singleton.h \
-    helperWindow.h
+    helperWindowTool.h
 
 SOURCES += \
         main.cpp \

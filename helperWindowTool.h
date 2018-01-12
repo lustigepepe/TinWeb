@@ -5,8 +5,6 @@
 
 bool updateName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibrary* mainXml)
 {
-    qDebug() <<" updateName ";
-
     if(indices.empty())
         return false;
     QStringList list = ml->stringList();
