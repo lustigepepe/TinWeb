@@ -38,11 +38,11 @@ private slots:
     void clickHandler(const QModelIndex& index);
     void on_ItemInList_clicked(const QModelIndex &index);
     void on_ItemInList_doubleClicked(const QModelIndex &index);
-
-
+    void doubleClickFileBrowser(const QModelIndex &index);
 
 protected:
     void dropEvent(QDropEvent *e);
+
 private:
     void itemListDoubleClicked(const QModelIndex &index);
     void itemListClicked(const QModelIndex &index);

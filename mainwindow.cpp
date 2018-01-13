@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    updateName(wasModified, listViewModel, mainXml);
+    setOverviewListName(wasModified, listViewModel, mainXml);
     delete ui;
 //    if(browserApp)
 //        delete browserApp;
@@ -48,33 +48,29 @@ void MainWindow::on_newSite_clicked()
 {
     // neue seite öffnen um dann eine seite angeben die in der liste erscheint
     // rechtsklick -> edit
+    qDebug() << "on_newSite_clicked";
 
-//    QFileInfo info( QFileDialog::getOpenFileName(this));
-//    QString item = info.baseName();
-//    QString path = info.absoluteFilePath();
-//    qDebug() << "Item"<< item << " -|- " << path;
-//    mainXml->readXML(&path, &item);
-//    QStringList list = listViewModel->stringList();
-//    listViewModel->setStringList(fillOverviewList(list));
+    QFileInfo info( QFileDialog::getOpenFileName(this));
+    QString item = info.baseName();
+    QString path = info.absoluteFilePath();
+    QStringList list = listViewModel->stringList();
+    list << item;
+    listViewModel->setStringList(list);
+    xmlData* temp = new xmlData();
+    temp->name = item;
+    temp->url.push_back(path);
+    convertWebarchiveToHtml(temp, desc);
+    mainXml->xmlVec->push_back(temp);
+
+
 }
 
 void MainWindow::on_newList_clicked()
 {
-
-//        QFileInfo info( QFileDialog::getOpenFileName(this));
-//        QString item = info.baseName();
-//        QString path = info.absoluteFilePath();
-//        qDebug() << "Item"<< item << " -|- " << path;
-//        mainXml->readXML(&path, &item);
-//        QStringList list = listViewModel->stringList();
-//        list << "List: "+ item;
-//        listViewModel->setStringList(fillOverviewList(list));
-//        xmlData* temp = new xmlData();
-//        if(!path.isNull())
-//            temp->url = path;
-//        if(!item.isNull())
-//            temp->name = item;
-//        mainXml->xmlVec->push_back(temp);
+    qDebug() << "on_newList_clicked";
+    QStringList list = listViewModel->stringList();
+    list << "empty list-> add a side with double click" ;
+    listViewModel->setStringList(list);
 }
 
 void MainWindow::on_overView_clicked()
@@ -97,59 +93,11 @@ QUrl MainWindow::startupUrl(QString* url)
 
 }
 
-void convertWebarchiveToHtml(xmlData* data, bool desc)
-{
-    for (auto& url : data->url)
-    {
-        QFileInfo info(url);
-        if(info.completeSuffix() == "webarchive" && desc)
-        {
-            bool unix = QSysInfo::productType() == "winrt" ? false : true;
-            QString newFolder, newFile;
-            if(unix)
-            {
-                newFolder = (info.canonicalPath()+"/NoWebArchive");
-                newFile = newFolder + "/" + data->name + ".html";
-            }
-            else
-            {
-                newFolder = (info.canonicalPath()+"\\NoWebArchive");
-                newFile = newFolder + "\\"+ data->name + ".html";
-            }
-
-            QProcess *proc = new QProcess();
-            if(!QFile(newFile).exists())
-            {
-
-                if(!QDir(newFolder).exists())
-                    QDir().mkdir(newFolder);
-
-                QString program;
-                QStringList arguments;
-                if(unix)
-                {
-                    program = "/usr/bin/textutil";
-                    arguments << "-convert"  << "html" << url
-                              << "-output" << newFile;
-                }
-                else
-                {
-                    program = "C:\Windows\SysWOW64\textutil";
-                    arguments << "-convert"  << "html" << url
-                              << "-output" << newFile;
-                }
-
-                proc->start(program, arguments);
-                proc->closeWriteChannel();
-            }
-        }
-    }
-}
-
 bool MainWindow::filterXMLData(QString &name, std::vector<QUrl>& url)
 {
     for(auto& x :  *mainXml->xmlVec)
     {
+        qDebug() << x->name;
         if(name == x->name)
         {
             for(auto& urlLoop : x->url)
@@ -167,11 +115,11 @@ bool MainWindow::filterXMLData(QString &name, std::vector<QUrl>& url)
                     {
                         if(unix)
                         {
-                            urlLoop = info.canonicalPath()+"/NoWebArchive" + "/" + name + ".html";
+                            urlLoop = info.canonicalPath()+"/NoWebArchive" + "/" + info.baseName() + ".html";
                         }
                         else
                         {
-                            urlLoop = info.canonicalPath()+ "\\NoWebArchive" + "\\" + name + ".html";
+                            urlLoop = info.canonicalPath()+ "\\NoWebArchive" + "\\" + info.baseName() + ".html";
                         }
                     }
                     ur = startupUrl(&urlLoop);
@@ -206,17 +154,8 @@ QStringList MainWindow::fillOverviewList(QStringList& list)
 
 void MainWindow::itemListClicked(const QModelIndex &index)
 {
-//    QTimer *timer = new QTimer(this);
-//       connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-//       timer->start(1000);
-//  QTimer::singleShot(2000, this, SIGNAL(test()));
-
-//    QTimer::singleShot(200, this, SLOT(on_ItemInList_clicked()));
-    if(doubleClick)
-    {
-        qDebug() << "notDoubleClick::Fail";
         QString titel = index.data().toString();
-        bool update = updateName(wasModified, listViewModel, mainXml);
+        bool update = setOverviewListName(wasModified, listViewModel, mainXml);
         if(!titel.startsWith("List") && update)
             titel = "List: "+ titel;
         std::vector<QUrl> urlVec;
@@ -257,27 +196,32 @@ void MainWindow::itemListClicked(const QModelIndex &index)
             qDebug() << titel << " " << url;
             qDebug() <<" ----------------------------";
         }
+}
+
+void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
+{
+    QFileInfo info = QFileDialog::getOpenFileName(this);
+//    QString item = info.baseName();
+    QString path = info.absoluteFilePath();
+    if(!path.isNull())
+    {
+        if(index.row() >= mainXml->xmlVec->size())
+        {
+            xmlData* temp = new xmlData();
+            temp->url.push_back(path);
+            convertWebarchiveToHtml(temp, desc);
+            mainXml->xmlVec->push_back(temp);
+        }
+        else
+            mainXml->xmlVec->at(index.row())->url.push_back(path);
     }
+    wasModified.push_back(index);
 }
 
 void MainWindow::itemListDoubleClicked(const QModelIndex &index)
 {
     doubleClick = false;
-
-
-//    wasModified.push_back(index);
-//    QFileInfo info( QFileDialog::getOpenFileName(this));
-//    QString item = info.baseName();
-//    QString path = info.absoluteFilePath();
-//    qDebug() << "Item"<< item << " -|- " << path;
-
-//    QStringList list = listViewModel->stringList();
-//    list << "List: "+ item;
-
-//    if(!path.isNull())
-//        mainXml->xmlVec->at(index.row())->url.push_back(path);
-//    if(!item.isNull())
-//        mainXml->xmlVec->at(index.row())->name = item;
+    QTimer::singleShot(8000, this, [&]{doubleClickFileBrowser(index);});
 }
 
 void MainWindow::dropEvent(QDropEvent *e)
@@ -310,7 +254,7 @@ void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 }
 void MainWindow::clickHandler(const QModelIndex& index)
 {
-    qDebug() <<"NO Fun";
+    qDebug() <<"doubleClick: " << doubleClick;
     if(!doubleClick)
         itemListClicked(index);
     else

@@ -37,7 +37,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>+ A Side</string>
+     <string>New List</string>
     </property>
    </widget>
    <widget class="QListView" name="ItemInList">

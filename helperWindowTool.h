@@ -3,7 +3,7 @@
 #include <QStringListModel>
 #include "xmllibrary.h"
 
-bool updateName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibrary* mainXml)
+bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibrary* mainXml)
 {
     if(indices.empty())
         return false;
@@ -22,18 +22,68 @@ bool updateName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibr
             mainXml->xmlVec->at(i)->name = "List: "+ st;
         }
         else
+        {
             mainXml->xmlVec->at(i)->name = st;
+            ml->setStringList(list);
+            indices.clear();
+            qDebug() <<" setOverviewListName ";
+            return false;
+        }
     }
     ml->setStringList(list);
     indices.clear();
-
-    qDebug() <<" updateName ";
+    qDebug() <<" setOverviewListName ";
     return true;
 }
 
 
+void convertWebarchiveToHtml(xmlData* data, bool desc)
+{
+    for (auto& url : data->url)
+    {
+        QFileInfo info(url);
+        if(info.completeSuffix() == "webarchive" && desc)
+        {
+            bool unix = QSysInfo::productType() == "winrt" ? false : true;
+            QString newFolder, newFile;
+            if(unix)
+            {
+                newFolder = (info.canonicalPath()+"/NoWebArchive");
+                newFile = newFolder + "/" + info.completeBaseName() + ".html";
+            }
+            else
+            {
+                newFolder = (info.canonicalPath()+"\\NoWebArchive");
+                newFile = newFolder + "\\"+ info.completeBaseName() + ".html";
+            }
 
+            QProcess *proc = new QProcess();
+            if(!QFile(newFile).exists())
+            {
 
+                if(!QDir(newFolder).exists())
+                    QDir().mkdir(newFolder);
 
+                QString program;
+                QStringList arguments;
+                if(unix)
+                {
+                    program = "/usr/bin/textutil";
+                    arguments << "-convert"  << "html" << url
+                              << "-output" << newFile;
+                }
+                else
+                {
+                    program = "C:\Windows\SysWOW64\textutil";
+                    arguments << "-convert"  << "html" << url
+                              << "-output" << newFile;
+                }
+
+                proc->start(program, arguments);
+                proc->closeWriteChannel();
+            }
+        }
+    }
+}
 
 #endif // HELPERWINDOW_H
