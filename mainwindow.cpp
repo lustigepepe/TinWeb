@@ -43,10 +43,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_newSite_clicked()
 {
-    // neue seite öffnen um dann eine seite angeben die in der liste erscheint
-    // rechtsklick -> edit
-    qDebug() << "on_newSite_clicked";
-
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString item = info.baseName();
     QString path = info.absoluteFilePath();
@@ -58,7 +54,6 @@ void MainWindow::on_newSite_clicked()
     temp->url.push_back(path);
     convertWebarchiveToHtml(temp, desc);
     mainXml->xmlVec->push_back(temp);
-
 }
 
 void MainWindow::on_newList_clicked()
@@ -206,7 +201,7 @@ void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
 void MainWindow::itemListDoubleClicked(const QModelIndex &index)
 {
     doubleClick = false;
-    QTimer::singleShot(8000, this, [&]{doubleClickFileBrowser(index);});
+    QTimer::singleShot(5000, this, [&]{doubleClickFileBrowser(index);});
 }
 
 void MainWindow::dropEvent(QDropEvent *e)

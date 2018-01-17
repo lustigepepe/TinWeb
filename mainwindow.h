@@ -47,7 +47,6 @@ private:
     void itemListDoubleClicked(const QModelIndex &index);
     void itemListClicked(const QModelIndex &index);
     typedef QWidget super;
-//    QQmlApplicationEngine* browserApp;
     bool isLeftClick;
     Ui::MainWindow *ui;
     Document m_content;

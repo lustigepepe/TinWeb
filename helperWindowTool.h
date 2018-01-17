@@ -1,6 +1,7 @@
 #ifndef HELPERWINDOW_H
 #define HELPERWINDOW_H
 #include <QStringListModel>
+#include <QDir>
 #include "xmllibrary.h"
 
 QUrl startupUrl(QString* url)
@@ -18,7 +19,6 @@ QUrl startupUrl(QString* url)
     return QUrl((url ?  *url : "http://qt.io/"), QUrl::TolerantMode);
 
 }
-
 
 bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibrary* mainXml)
 {
@@ -53,6 +53,20 @@ bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml
     return true;
 }
 
+void deAfterConvertion(QString& path, QString* filter = nullptr)
+{
+    QStringList list;
+    list << "*.png" << "*.jpg" << "*.gif" << "*.svg";
+    if(filter)
+        list << *filter;
+    QDir dir(path);
+    dir.setNameFilters(list);
+    dir.setFilter(QDir::Files);
+    foreach(QString dirFile, dir.entryList())
+    {
+        dir.remove(dirFile);
+    }
+}
 
 void convertWebarchiveToHtml(xmlData* data, bool desc)
 {
@@ -61,6 +75,7 @@ void convertWebarchiveToHtml(xmlData* data, bool desc)
         QFileInfo info(url);
         if(info.completeSuffix() == "webarchive" && desc)
         {
+            bool newCreated = false;
             bool unix = QSysInfo::productType() == "winrt" ? false : true;
             QString newFolder, newFile;
             if(unix)
@@ -77,7 +92,7 @@ void convertWebarchiveToHtml(xmlData* data, bool desc)
             QProcess *proc = new QProcess();
             if(!QFile(newFile).exists())
             {
-
+                newCreated = true;
                 if(!QDir(newFolder).exists())
                     QDir().mkdir(newFolder);
 
@@ -95,12 +110,12 @@ void convertWebarchiveToHtml(xmlData* data, bool desc)
                     arguments << "-convert"  << "html" << url
                               << "-output" << newFile;
                 }
-
                 proc->start(program, arguments);
                 proc->closeWriteChannel();
             }
+            if(newCreated)
+                deAfterConvertion(newFolder);
         }
     }
 }
-
 #endif // HELPERWINDOW_H
