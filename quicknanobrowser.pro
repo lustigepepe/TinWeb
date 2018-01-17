@@ -33,6 +33,7 @@ FORMS += \
         mainwindow.ui
 
 QT += qml quick webengine webenginewidgets webchannel xml core
+#declarative
 qtHaveModule(widgets) {
     greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
     # QApplication is required to get native styling with QtQuickControls

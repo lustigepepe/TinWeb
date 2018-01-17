@@ -3,6 +3,23 @@
 #include <QStringListModel>
 #include "xmllibrary.h"
 
+QUrl startupUrl(QString* url)
+{
+    QUrl ret;
+    QStringList args(qApp->arguments());
+    args.takeFirst();
+    Q_FOREACH (const QString& arg, args) {
+        if (arg.startsWith(QLatin1Char('-')))
+             continue;
+        ret = Utils::fromUserInput(arg);
+        if (ret.isValid())
+            return ret;
+    }
+    return QUrl((url ?  *url : "http://qt.io/"), QUrl::TolerantMode);
+
+}
+
+
 bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibrary* mainXml)
 {
     if(indices.empty())

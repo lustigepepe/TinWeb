@@ -62,6 +62,7 @@ typedef QGuiApplication Application;
 #include <QtQml/QQmlContext>
 #include <QtWebEngine/qtwebengineglobal.h>
 #include <QWebEngineView>
+#include <QQmlComponent>
 
 // later Important Steps -> convert webarchive wenn
 // file was added new and app is still running
@@ -70,36 +71,6 @@ typedef QGuiApplication Application;
 // -> bool QFile::remove(const QString &fileName)
 // -> QFileInfoList QDir::entryInfoList
 
-QUrl startupUrl(QString* url = nullptr)
-{
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
-    }
-    return QUrl((url ?  *url : "http://qt.io/"));
-}
-
-//static QUrl startupUrl()
-//{
-//    QUrl ret;
-//    QStringList args(qApp->arguments());
-//    args.takeFirst();
-//    Q_FOREACH (const QString& arg, args) {
-//        if (arg.startsWith(QLatin1Char('-')))
-//             continue;
-//        ret = Utils::fromUserInput(arg);
-//        if (ret.isValid())
-//            return ret;
-//    }
-//    return QUrl(QStringLiteral("http://qt.io/"));
-//}
-
 int main(int argc, char **argv)
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -107,26 +78,10 @@ int main(int argc, char **argv)
     Application app(argc, argv);
     MainWindow mainW;
     mainW.show();
-//    QObject::connect(&mainW, &MainWindow::clicked, SLOT(on_ItemInList_clicked(const QModelIndex &index)));
-//    QObject::connect(&mainW, &MainWindow::doubleClicked, SLOT(on_ItemInList_doubleClicked(const QModelIndex &index)));
-
-//    QObject::connect(ui.tableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(myCellClicked(int, int)));
-//    QObject::connect(ui.tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(tableItemClicked(int,int)));
-
-
     QtWebEngine::initialize();
-    //    Test
-    //   Browser::instance()->createBrowser();
     mainW.browserApp = std::make_unique<QQmlApplicationEngine>();
     Utils utils;
     mainW.browserApp->rootContext()->setContextProperty("utils", &utils);
-    //    mainW.browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
-    //    QMetaObject::invokeMethod(mainW.browserApp->rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
-    //QtWebEngine::initialize();
-    //    QQmlApplicationEngine appEngine;
-    //    Utils utils;
-    //    appEngine.rootContext()->setContextProperty("utils", &utils);
-    //    appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
-    //    QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
+
     return app.exec();
 }

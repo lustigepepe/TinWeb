@@ -18,7 +18,6 @@
 #include <QtWebEngine/qtwebengineglobal.h>
 #include <QQuickItem>
 #include "helperWindowTool.h"
-//#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -37,8 +36,6 @@ MainWindow::~MainWindow()
 {
     setOverviewListName(wasModified, listViewModel, mainXml);
     delete ui;
-//    if(browserApp)
-//        delete browserApp;
     if (mainXml)
         delete mainXml;
     qDebug() << " Destroy MainWindow !!--" << endl;
@@ -62,7 +59,6 @@ void MainWindow::on_newSite_clicked()
     convertWebarchiveToHtml(temp, desc);
     mainXml->xmlVec->push_back(temp);
 
-
 }
 
 void MainWindow::on_newList_clicked()
@@ -73,38 +69,25 @@ void MainWindow::on_newList_clicked()
     listViewModel->setStringList(list);
 }
 
-void MainWindow::on_overView_clicked()
+void MainWindow::on_deBrow_clicked()
 {
-}
-
-QUrl MainWindow::startupUrl(QString* url)
-{
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
-    }
-    return QUrl((url ?  *url : "http://qt.io/"), QUrl::TolerantMode);
-
+    if(!deBrow)
+        deBrow = true;
+    else
+        deBrow = false;
 }
 
 bool MainWindow::filterXMLData(QString &name, std::vector<QUrl>& url)
 {
     for(auto& x :  *mainXml->xmlVec)
     {
-        qDebug() << x->name;
         if(name == x->name)
         {
-            for(auto& urlLoop : x->url)
+            for(auto urlLoop : x->url)
             {
                 QUrl ur;
                 QFileInfo info(urlLoop);
-                if(!desc || !(info.completeSuffix() == "webarchive"))
+                if(!desc && info.completeSuffix() == "webarchive" || deBrow)
                 {
                     ur = startupUrl(&urlLoop);
                 }
@@ -141,12 +124,7 @@ QStringList MainWindow::fillOverviewList(QStringList& list)
         for(auto &x : *mainXml->xmlVec)
         {
             list << x->name;
-//            for(auto& xUr : x->url)
-//            {
-                //                QFileInfo info(xUr);
-                //                if(info.completeSuffix() == "webarchive" && desc)
-                convertWebarchiveToHtml(x, desc);
-//            }
+            convertWebarchiveToHtml(x, desc);
         }
     }
     return list;
@@ -165,23 +143,31 @@ void MainWindow::itemListClicked(const QModelIndex &index)
             QFileInfo info(url.toString());
             if(IsRuning)
             {
-                if(!desc && info.completeSuffix() == "webarchive")
+                if(!desc && info.completeSuffix() == "webarchive" || deBrow)
                 {
                     QDesktopServices::openUrl(url);
                 }
                 else
                 {
+                    QVariant value;
                     QMetaObject::invokeMethod(browserApp->rootObjects().
-                                              first()->findChild<QObject*>("browserWindow"),"createTab",
-                                              Q_ARG(QVariant, url));
+                                              first()->findChild<QObject*>("browserWindow"),"tabCount",
+                                              Q_RETURN_ARG(QVariant, value));
+                    if(value.toInt() == 0)
+                    {
+                        browserApp->load(QUrl("qrc:/ApplicationRoot.qml"));
+                        QMetaObject::invokeMethod(browserApp->rootObjects().first(), "load",
+                                                  Q_ARG(QVariant, url));
+                    }
+                    else
+                        QMetaObject::invokeMethod(browserApp->rootObjects().
+                                                  first()->findChild<QObject*>("browserWindow"),"createTab",
+                                                  Q_ARG(QVariant, url));
                 }
-                //        QMetaObject::invokeMethod(browserApp->rootObjects().
-                //                                  first()->findChild<QObject*>("browserWindow"),"createTab",
-                //                                  Q_ARG(QVariant, startupUrl()));
             }
             else
             {
-                if(!desc && info.completeSuffix() == "webarchive")
+                if((!desc && info.completeSuffix() == "webarchive") || deBrow)
                 {
                     QDesktopServices::openUrl(url);
                 }
@@ -201,7 +187,6 @@ void MainWindow::itemListClicked(const QModelIndex &index)
 void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
 {
     QFileInfo info = QFileDialog::getOpenFileName(this);
-//    QString item = info.baseName();
     QString path = info.absoluteFilePath();
     if(!path.isNull())
     {
@@ -252,9 +237,9 @@ void MainWindow::on_ItemInList_clicked(const QModelIndex &index)
 {
     QTimer::singleShot(200, this, [&]{clickHandler(index);});
 }
+
 void MainWindow::clickHandler(const QModelIndex& index)
 {
-    qDebug() <<"doubleClick: " << doubleClick;
     if(!doubleClick)
         itemListClicked(index);
     else

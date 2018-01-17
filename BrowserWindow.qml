@@ -89,12 +89,17 @@ ApplicationWindow {
         property alias autoLoadIconsForPage: autoLoadIconsForPage.checked
         property alias touchIconsEnabled: touchIconsEnabled.checked
     }
+    // small interface to C++ -part
     function createTab(url) {
         tabs.createEmptyTab(currentWebView.profile);
         tabs.currentIndex = tabs.count - 1;
         addressBar.forceActiveFocus();
         addressBar.selectAll();
         currentWebView.url = url;
+    }
+
+    function tabCount() {
+        return tabs.count;
     }
     Action {
         shortcut: "Ctrl+D"

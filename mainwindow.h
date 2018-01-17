@@ -34,7 +34,7 @@ public:
 private slots:
     void on_newSite_clicked();
     void on_newList_clicked();
-    void on_overView_clicked();
+    void on_deBrow_clicked();
     void clickHandler(const QModelIndex& index);
     void on_ItemInList_clicked(const QModelIndex &index);
     void on_ItemInList_doubleClicked(const QModelIndex &index);
@@ -48,7 +48,6 @@ private:
     void itemListClicked(const QModelIndex &index);
     typedef QWidget super;
 //    QQmlApplicationEngine* browserApp;
-    QUrl startupUrl(QString* url = nullptr);
     bool isLeftClick;
     Ui::MainWindow *ui;
     Document m_content;
@@ -57,7 +56,7 @@ private:
     std::vector<QModelIndex> wasModified;
     bool desc = false;
     bool doubleClick = false;
-
+    bool deBrow = false;
 };
 
 class Browser : public Singleton<Browser>
