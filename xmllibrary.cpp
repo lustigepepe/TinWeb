@@ -5,6 +5,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDomProcessingInstruction>
+
 XMlLibrary::XMlLibrary(QString* path)
     : xmlVec(new std::vector<xmlData*>)
 {
@@ -20,7 +21,6 @@ XMlLibrary::XMlLibrary(QString* path)
 
 XMlLibrary::~XMlLibrary()
 {
-    writeXML();
     if (xmlFile)
         delete xmlFile;
     if (xmlVec)
@@ -67,6 +67,7 @@ void XMlLibrary::readXML(QString* path, QString* name)
        n = n.nextSibling();
     }
 }
+
 void XMlLibrary::writeXML()
 {
     if (!xmlFile->open(QIODevice::WriteOnly | QFile::Text))
@@ -85,11 +86,9 @@ void XMlLibrary::writeXML()
         QDomElement item = doc.createElement("item");
         QDomElement urlE = doc.createElement("url");
         QDomElement nameE = doc.createElement("name");
-//        QDomText urlText = doc.createTextNode(data->url);
-//        urlE.appendChild(urlText);
+
         QDomText nameText = doc.createTextNode(data->name);
         nameE.appendChild(nameText);
-//        item.appendChild(urlE);
         item.appendChild(nameE);
 
         if (!data->url.empty())
@@ -105,7 +104,6 @@ void XMlLibrary::writeXML()
         mainTag.appendChild(item);
     }
     doc.appendChild(mainTag);
-
     QTextStream output(xmlFile);
     output << doc.toString();
     xmlFile->close();

@@ -30,11 +30,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QStringList list;
     listViewModel->setStringList(fillOverviewList(list));
     ui->ItemInList->setModel(listViewModel);
+    listIsChanged = mainXml->xmlVec->capacity();
 }
 
 MainWindow::~MainWindow()
 {
     setOverviewListName(wasModified, listViewModel, mainXml);
+    if(listIsChanged)
+        mainXml->writeXML();
     delete ui;
     if (mainXml)
         delete mainXml;
@@ -54,6 +57,7 @@ void MainWindow::on_newSite_clicked()
     temp->url.push_back(path);
     convertWebarchiveToHtml(temp, desc);
     mainXml->xmlVec->push_back(temp);
+    listIsChanged = true;
 }
 
 void MainWindow::on_newList_clicked()
@@ -196,6 +200,7 @@ void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
             mainXml->xmlVec->at(index.row())->url.push_back(path);
     }
     wasModified.push_back(index);
+    listIsChanged = true;
 }
 
 void MainWindow::itemListDoubleClicked(const QModelIndex &index)

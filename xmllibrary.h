@@ -15,13 +15,12 @@ public:
     ~XMlLibrary();
     void readXML(QString* path = nullptr, QString* name = nullptr);
     std::unique_ptr<std::vector<xmlData*>> xmlVec;
-private:
     void writeXML();
+private:
     void parseString(QString& line);
     QFile* xmlFile;
     QDomElement lastElement;
     QDomDocument doc;
-
 };
 
 struct xmlData

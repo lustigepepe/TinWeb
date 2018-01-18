@@ -56,6 +56,7 @@ private:
     bool desc = false;
     bool doubleClick = false;
     bool deBrow = false;
+    bool listIsChanged = false;
 };
 
 class Browser : public Singleton<Browser>

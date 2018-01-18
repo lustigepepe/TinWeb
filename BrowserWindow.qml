@@ -354,12 +354,11 @@ ApplicationWindow {
             tab.active = true;
             tab.title = Qt.binding(function() { return tab.item.title });
             tab.item.profile = profile;
+            tab.item.visible = true;
             return tab;
         }
-
         anchors.fill: parent
         Component.onCompleted: createEmptyTab(defaultProfile)
-
         Component {
             id: tabComponent
             WebEngineView {
@@ -458,9 +457,13 @@ ApplicationWindow {
 
                 onWindowCloseRequested: {
                     if (tabs.count == 1)
+                    {
                         browserWindow.close();
+                    }
                     else
+                    {
                         tabs.removeTab(tabs.currentIndex);
+                    }
                 }
 
                 Timer {
