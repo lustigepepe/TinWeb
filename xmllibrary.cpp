@@ -13,7 +13,7 @@ XMlLibrary::XMlLibrary(QString* path)
         xmlFile = new QFile(*path);
     else
     {
-        QString current =  QDir::currentPath();
+        QString current = QCoreApplication::applicationDirPath();
         QStringList url = current.split(QFileInfo(QCoreApplication::applicationFilePath()).fileName());
         xmlFile = new QFile(url.at(0)+QString("main.xml"));
     }
