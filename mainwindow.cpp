@@ -186,7 +186,7 @@ void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
 {
     QFileInfo info = QFileDialog::getOpenFileName(this);
     QString path = info.absoluteFilePath();
-    if(!path.isNull())
+    if(!path.isEmpty())
     {
         if(index.row() >= mainXml.xmlVec.size())
         {
@@ -196,10 +196,12 @@ void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
             mainXml.xmlVec.push_back(temp);
         }
         else
+        {
             mainXml.xmlVec.at(index.row()).url.push_back(path);
+        }
+        wasModified.push_back(index);
+        listIsChanged = true;
     }
-    wasModified.push_back(index);
-    listIsChanged = true;
 }
 
 void MainWindow::itemListDoubleClicked(const QModelIndex &index)

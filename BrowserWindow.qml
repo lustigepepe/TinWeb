@@ -358,6 +358,45 @@ ApplicationWindow {
             return tab;
         }
         anchors.fill: parent
+        style: TabViewStyle {
+            property color frameColor: "white"
+            property color fillColor: "blue"
+            frameOverlap: 1
+            tab: Rectangle {
+                color: styleData.selected ? fillColor : frameColor
+                implicitWidth: (text.width + 36)
+                implicitHeight: 20
+                Rectangle { height: 1 ; width: parent.width ; color: frameColor}
+                Rectangle { height: parent.height ; width: 1; color: frameColor}
+                Rectangle { x: parent.width -1; height: parent.height ; width: 1; color: frameColor}
+                id: tabButton
+                Button {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: 4
+                    style: ButtonStyle {
+                        background: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 12
+                            radius: width/3
+                            color: "#00000000"
+                            Text {text: "X" ; anchors.centerIn: parent ; color: tabButton.color === fillColor ? "black" : "#00000000"}
+                        }
+                    }
+                    Text {
+                        id: text
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: 18
+                        text: styleData.title
+                        color: "black"
+
+                    }
+                    onClicked: currentWebView.triggerWebAction(WebEngineView.RequestClose);
+
+                }
+            }
+        }
         Component.onCompleted: createEmptyTab(defaultProfile)
         Component {
             id: tabComponent
