@@ -11,9 +11,11 @@ using xmlData = struct xmlData;
 class XMlLibrary
 {
 public:
-    XMlLibrary(QString* path = nullptr);
+    XMlLibrary(QString& path);
+    XMlLibrary();
+
     ~XMlLibrary();
-    void readXML(QString* path = nullptr, QString* name = nullptr);
+    void readXML();
     std::unique_ptr<std::vector<xmlData*>> xmlVec;
     void writeXML();
 private:

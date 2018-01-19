@@ -49,6 +49,8 @@ void MainWindow::on_newSite_clicked()
     QFileInfo info( QFileDialog::getOpenFileName(this));
     QString item = info.baseName();
     QString path = info.absoluteFilePath();
+    if(path.isEmpty())
+        return;
     QStringList list = listViewModel->stringList();
     list << item;
     listViewModel->setStringList(list);

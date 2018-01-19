@@ -7,18 +7,23 @@
 #include <QDomProcessingInstruction>
 #include <QStandardPaths>
 
-XMlLibrary::XMlLibrary(QString* path)
+XMlLibrary::XMlLibrary(QString& path)
     : xmlVec(new std::vector<xmlData*>)
 {
-    if (path)
-        xmlFile = new QFile(*path);
+    if (!path.isEmpty())
+        xmlFile = new QFile(path);
     else
     {
         QString root = QDir::homePath();
         xmlFile = new QFile(root+QString("/TinWeb.xml"));
     }
 }
-
+XMlLibrary::XMlLibrary()
+    : xmlVec(new std::vector<xmlData*>)
+{
+        QString root = QDir::homePath();
+        xmlFile = new QFile(root+QString("/TinWeb.xml"));
+}
 XMlLibrary::~XMlLibrary()
 {
     if (xmlFile)
@@ -30,7 +35,7 @@ XMlLibrary::~XMlLibrary()
     }
 }
 
-void XMlLibrary::readXML(QString* path, QString* name)
+void XMlLibrary::readXML()
 {
     QDomDocument doc;
     if (!xmlFile->open(QIODevice::ReadWrite))
