@@ -5,6 +5,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDomProcessingInstruction>
+#include <QStandardPaths>
 
 XMlLibrary::XMlLibrary(QString* path)
     : xmlVec(new std::vector<xmlData*>)
@@ -13,9 +14,8 @@ XMlLibrary::XMlLibrary(QString* path)
         xmlFile = new QFile(*path);
     else
     {
-        QString current = QCoreApplication::applicationDirPath();
-        QStringList url = current.split(QFileInfo(QCoreApplication::applicationFilePath()).fileName());
-        xmlFile = new QFile(url.at(0)+QString("main.xml"));
+        QString root = QDir::homePath();
+        xmlFile = new QFile(root+QString("/TinWeb.xml"));
     }
 }
 

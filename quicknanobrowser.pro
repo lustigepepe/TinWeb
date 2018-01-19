@@ -24,8 +24,7 @@ OTHER_FILES += ApplicationRoot.qml \
                BrowserDialog.qml \
                BrowserWindow.qml \
                DownloadView.qml \
-               FullScreenNotification.qml \
-               xml/main.xml
+               FullScreenNotification.qml
 
 RESOURCES += resources.qrc
 
@@ -42,18 +41,44 @@ DEFINES += QT_DEPRECATED_WARNINGS
 target.path = /Users/bic_mac/Documents/QT/quicknanobrowser
 INSTALLS += target
 
-#using to for xmlSettings
-copydata.commands = $(COPY_DIR) $$PWD/xml/main.xml $$OUT_PWD
-first.depends = $(first) copydata
-export(first.depends)
-export(copydata.commands)
-QMAKE_EXTRA_TARGETS += first copydata
-
-macx
+macx:unix
 {
     ICON = icon.icns
+    ROOT = ~
+    #using to for xmlSettings
+    copydata.commands = $(COPY_DIR) $$PWD/xml/tinWeb.xml $$ROOT
+    first.depends = $(first) copydata
+    export(first.depends)
+    export(copydata.commands)
+    QMAKE_EXTRA_TARGETS += first copydata
 }
 win32
 {
     RC_FILE = icon.rc
+    WI_ROOT = C:/Users/<USER>
+    #using to for xmlSettings
+    copydataWIN.commandsWIN = $(COPY_DIR) $$PWD/xml/main.xml $$WI_ROOT
+    firstWIN.dependsWIN = $(first) copydataWIN
+    export(firstWIN.dependsWIN)
+    export(copydataWIN.commandsWIN)
+    QMAKE_EXTRA_TARGETS += first copydataWIN
 }
+#unix
+#{
+#    RC_FILE = icon.rc
+#    WI_ROOT = C:/Users/<USER>
+#    #using to for xmlSettings
+#    copydataUN.commandsUN = $(COPY_DIR) $$PWD/xml/main.xml $$WI_ROOT
+#    firstUN.dependsUN = $(first) copydataUN
+#    export(firstUN.dependsUN)
+#    export(copydataUN.commandsUN)
+#    QMAKE_EXTRA_TARGETS += first copydataUN
+#}
+
+
+DISTFILES += \
+    xml/tinWeb.xml
+
+
+
+
