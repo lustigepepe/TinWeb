@@ -20,7 +20,7 @@ QUrl startupUrl(QString* url)
 
 }
 
-bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibrary* mainXml)
+bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml, XMlLibrary& mainXml)
 {
     if(indices.empty())
         return false;
@@ -29,18 +29,18 @@ bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml
     {
         int i = in.row();
         QString st = in.data().toString();
-        if (mainXml->xmlVec->at(i)->url.size() > 1)
+        if (mainXml.xmlVec.at(i).url.size() > 1)
         {
             QStringList split = list.at(i).split("List: ");
             if(split.size() == 1)
                 list.replace(i,"List: "+st);
             else
                 list.replace(i, st);
-            mainXml->xmlVec->at(i)->name = "List: "+ st;
+            mainXml.xmlVec.at(i).name = "List: "+ st;
         }
         else
         {
-            mainXml->xmlVec->at(i)->name = st;
+            mainXml.xmlVec.at(i).name = st;
             ml->setStringList(list);
             indices.clear();
             qDebug() <<" setOverviewListName ";
@@ -68,9 +68,9 @@ void deAfterConvertion(QString& path, QString* filter = nullptr)
     }
 }
 
-void convertWebarchiveToHtml(xmlData* data, bool desc)
+void convertWebarchiveToHtml(xmlData& data, bool desc)
 {
-    for (auto& url : data->url)
+    for (auto& url : data.url)
     {
         QFileInfo info(url);
         if(info.completeSuffix() == "webarchive" && desc)

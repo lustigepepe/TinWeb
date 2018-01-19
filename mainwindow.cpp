@@ -25,22 +25,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     desc = QSysInfo::productType() == "winrt" || "osx" ? true : false;
-    mainXml = new XMlLibrary();
     listViewModel = new QStringListModel(this);
     QStringList list;
     listViewModel->setStringList(fillOverviewList(list));
     ui->ItemInList->setModel(listViewModel);
-    listIsChanged = mainXml->xmlVec->capacity();
+    listIsChanged = mainXml.xmlVec.capacity();
 }
 
 MainWindow::~MainWindow()
 {
     setOverviewListName(wasModified, listViewModel, mainXml);
     if(listIsChanged)
-        mainXml->writeXML();
+        mainXml.writeXML();
     delete ui;
-    if (mainXml)
-        delete mainXml;
     qDebug() << " Destroy MainWindow !!--" << endl;
 }
 
@@ -54,11 +51,11 @@ void MainWindow::on_newSite_clicked()
     QStringList list = listViewModel->stringList();
     list << item;
     listViewModel->setStringList(list);
-    xmlData* temp = new xmlData();
-    temp->name = item;
-    temp->url.push_back(path);
+    xmlData temp;
+    temp.name = item;
+    temp.url.push_back(path);
     convertWebarchiveToHtml(temp, desc);
-    mainXml->xmlVec->push_back(temp);
+    mainXml.xmlVec.push_back(temp);
     listIsChanged = true;
 }
 
@@ -80,11 +77,11 @@ void MainWindow::on_deBrow_clicked()
 
 bool MainWindow::filterXMLData(QString &name, std::vector<QUrl>& url)
 {
-    for(auto& x :  *mainXml->xmlVec)
+    for(auto& x :  mainXml.xmlVec)
     {
-        if(name == x->name)
+        if(name == x.name)
         {
-            for(auto urlLoop : x->url)
+            for(auto urlLoop : x.url)
             {
                 QUrl ur;
                 QFileInfo info(urlLoop);
@@ -111,7 +108,7 @@ bool MainWindow::filterXMLData(QString &name, std::vector<QUrl>& url)
                 ur.setScheme("file");
                 url.push_back(ur);
             }
-            return x->url.size() > 1 ? true : false;
+            return x.url.size() > 1 ? true : false;
         }
     }
     return false;
@@ -119,12 +116,12 @@ bool MainWindow::filterXMLData(QString &name, std::vector<QUrl>& url)
 
 QStringList MainWindow::fillOverviewList(QStringList& list)
 {
-    mainXml->readXML();
-    if (mainXml && !mainXml->xmlVec->empty())
+    mainXml.readXML();
+    if (!mainXml.xmlVec.empty())
     {
-        for(auto &x : *mainXml->xmlVec)
+        for(auto &x : mainXml.xmlVec)
         {
-            list << x->name;
+            list << x.name;
             convertWebarchiveToHtml(x, desc);
         }
     }
@@ -191,15 +188,15 @@ void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
     QString path = info.absoluteFilePath();
     if(!path.isNull())
     {
-        if(index.row() >= mainXml->xmlVec->size())
+        if(index.row() >= mainXml.xmlVec.size())
         {
-            xmlData* temp = new xmlData();
-            temp->url.push_back(path);
+            xmlData temp;
+            temp.url.push_back(path);
             convertWebarchiveToHtml(temp, desc);
-            mainXml->xmlVec->push_back(temp);
+            mainXml.xmlVec.push_back(temp);
         }
         else
-            mainXml->xmlVec->at(index.row())->url.push_back(path);
+            mainXml.xmlVec.at(index.row()).url.push_back(path);
     }
     wasModified.push_back(index);
     listIsChanged = true;

@@ -29,7 +29,7 @@ public:
     ~MainWindow();
     bool IsRuning = false;
     QStringListModel *listViewModel;
-    XMlLibrary* mainXml;
+    XMlLibrary mainXml;
 
 private slots:
     void on_newSite_clicked();

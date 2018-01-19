@@ -8,47 +8,34 @@
 #include <QStandardPaths>
 
 XMlLibrary::XMlLibrary(QString& path)
-    : xmlVec(new std::vector<xmlData*>)
 {
     if (!path.isEmpty())
-        xmlFile = new QFile(path);
+        xmlFile.setFileName(path);
     else
     {
         QString root = QDir::homePath();
-        xmlFile = new QFile(root+QString("/TinWeb.xml"));
+        xmlFile.setFileName(root+QString("/TinWeb.xml"));
     }
 }
 XMlLibrary::XMlLibrary()
-    : xmlVec(new std::vector<xmlData*>)
 {
-        QString root = QDir::homePath();
-        xmlFile = new QFile(root+QString("/TinWeb.xml"));
+    QString root = QDir::homePath();
+    xmlFile.setFileName(root+QString("/TinWeb.xml"));
 }
-XMlLibrary::~XMlLibrary()
-{
-    if (xmlFile)
-        delete xmlFile;
-    if (xmlVec)
-    {
-        for (auto &x : *xmlVec)
-            delete x;
-    }
-}
+XMlLibrary::~XMlLibrary(){}
 
 void XMlLibrary::readXML()
 {
     QDomDocument doc;
-    if (!xmlFile->open(QIODevice::ReadWrite))
+    if (!xmlFile.open(QIODevice::ReadWrite))
         return;
-    if (!doc.setContent(xmlFile)) {
-        xmlFile->close();
+    if (!doc.setContent(&xmlFile)) {
+        xmlFile.close();
         return;
     }
-    xmlFile->close();
+    xmlFile.close();
     QDomElement rootDocElem = doc.documentElement();
     QDomNode n = rootDocElem.firstChild();
-    if (!xmlVec && !n.isNull())
-        xmlVec = std::make_unique<std::vector<xmlData*>>();
     while(!n.isNull()) {
        QDomElement e = n.toElement(); // try to convert the node to an element.
        QString  test = e.tagName();
@@ -57,16 +44,16 @@ void XMlLibrary::readXML()
            if(!lastElement.isElement())
            {
                QDomElement nameT = e.firstChildElement("name");
-               xmlData* temp = new xmlData();
+               xmlData temp;
                if(!nameT.isNull())
-                   temp->name = nameT.text();
+                   temp.name = nameT.text();
                for(QDomNode urlNode = e.firstChild();!urlNode.isNull();
                    urlNode = urlNode.nextSibling())
                {
                    if (urlNode.toElement().tagName() == "url")
-                      temp->url.push_back(urlNode.toElement().text());
+                      temp.url.push_back(urlNode.toElement().text());
                }
-               xmlVec->push_back(temp);
+               xmlVec.push_back(temp);
            }
        }
        n = n.nextSibling();
@@ -75,10 +62,10 @@ void XMlLibrary::readXML()
 
 void XMlLibrary::writeXML()
 {
-    if (!xmlFile->open(QIODevice::WriteOnly | QFile::Text))
+    if (!xmlFile.open(QIODevice::WriteOnly | QFile::Text))
     {
         qDebug() << "Error writing to XML";
-        xmlFile->close();
+        xmlFile.close();
         return;
     }
     QDomDocument doc;
@@ -86,19 +73,19 @@ void XMlLibrary::writeXML()
     doc.appendChild(proIn);
 
     QDomElement mainTag = doc.createElement("mainXml");
-    for(auto& data : *xmlVec)
+    for(auto& data : xmlVec)
     {
         QDomElement item = doc.createElement("item");
         QDomElement urlE = doc.createElement("url");
         QDomElement nameE = doc.createElement("name");
 
-        QDomText nameText = doc.createTextNode(data->name);
+        QDomText nameText = doc.createTextNode(data.name);
         nameE.appendChild(nameText);
         item.appendChild(nameE);
 
-        if (!data->url.empty())
+        if (!data.url.empty())
         {
-            for(auto record : data->url)
+            for(auto record : data.url)
             {
                 QDomElement urlE = doc.createElement("url");
                 QDomText urlText = doc.createTextNode(record);
@@ -109,8 +96,8 @@ void XMlLibrary::writeXML()
         mainTag.appendChild(item);
     }
     doc.appendChild(mainTag);
-    QTextStream output(xmlFile);
+    QTextStream output(&xmlFile);
     output << doc.toString();
-    xmlFile->close();
+    xmlFile.close();
 }
 

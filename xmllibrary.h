@@ -6,7 +6,7 @@
 #include <memory>
 #include <QDomDocument>
 
-using xmlData = struct xmlData;
+struct xmlData;
 
 class XMlLibrary
 {
@@ -16,11 +16,11 @@ public:
 
     ~XMlLibrary();
     void readXML();
-    std::unique_ptr<std::vector<xmlData*>> xmlVec;
+    std::vector<xmlData> xmlVec;
     void writeXML();
 private:
     void parseString(QString& line);
-    QFile* xmlFile;
+    QFile xmlFile;
     QDomElement lastElement;
     QDomDocument doc;
 };
