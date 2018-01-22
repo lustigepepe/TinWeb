@@ -58,7 +58,7 @@ Window {
     width: 800
     height: 600
     visible: true
-    onClosing: destroy()
+    //onClosing: destroy()
     WebEngineView {
         id: webView
         anchors.fill: parent

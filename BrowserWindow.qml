@@ -359,17 +359,28 @@ ApplicationWindow {
         }
         anchors.fill: parent
         style: TabViewStyle {
-            property color frameColor: "white"
+            property color frameColor: "gainsboro"
             property color fillColor: "blue"
             frameOverlap: 1
             tab: Rectangle {
+                border.color:  "white"
+                border.width : 2
                 color: styleData.selected ? fillColor : frameColor
-                implicitWidth: (text.width + 36)
-                implicitHeight: 20
+                implicitWidth: (text.width + 40)
+                implicitHeight: 24
+                radius: 8
                 Rectangle { height: 1 ; width: parent.width ; color: frameColor}
                 Rectangle { height: parent.height ; width: 1; color: frameColor}
                 Rectangle { x: parent.width -1; height: parent.height ; width: 1; color: frameColor}
                 id: tabButton
+                Text {
+                    id: text
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: 18
+                    text: styleData.title
+                    color: "black"
+                }
                 Button {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
@@ -380,23 +391,14 @@ ApplicationWindow {
                             implicitHeight: 12
                             radius: width/3
                             color: "#00000000"
-                            Text {text: "X" ; anchors.centerIn: parent ; color: tabButton.color === fillColor ? "black" : "#00000000"}
+                            Text {text: "x" ; anchors.centerIn: parent ; color: tabButton.color === fillColor ? "black" : "#00000000"}
                         }
                     }
-                    Text {
-                        id: text
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.leftMargin: 18
-                        text: styleData.title
-                        color: "black"
-
-                    }
-                    onClicked: currentWebView.triggerWebAction(WebEngineView.RequestClose);
-
+                    onClicked: currentWebView.triggerWebAction(WebEngineView.RequestClose)
                 }
             }
         }
+
         Component.onCompleted: createEmptyTab(defaultProfile)
         Component {
             id: tabComponent
