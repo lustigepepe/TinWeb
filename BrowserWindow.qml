@@ -58,6 +58,7 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
 import QtWebEngine 1.3
+import version.printer 1.0
 
 ApplicationWindow {
     id: browserWindow
@@ -197,33 +198,44 @@ ApplicationWindow {
         onTriggered: currentWebView.triggerWebAction(WebEngineView.Forward)
     }
 
+    Printer {
+        id: printer
+    }
     toolBar: ToolBar {
         id: navigationBar
-            RowLayout {
-                anchors.fill: parent
-                ToolButton {
-                    enabled: currentWebView && (currentWebView.canGoBack || currentWebView.canGoForward)
-                    menu:Menu {
-                        id: historyMenu
-
-                        Instantiator {
-                            model: currentWebView && currentWebView.navigationHistory.items
-                            MenuItem {
-                                text: model.title
-                                onTriggered: currentWebView.goBackOrForward(model.offset)
-                                checkable: !enabled
-                                checked: !enabled
-                                enabled: model.offset
-                            }
-
-                            onObjectAdded: historyMenu.insertItem(index, object)
-                            onObjectRemoved: historyMenu.removeItem(object)
-                        }
+        RowLayout {
+            anchors.fill: parent
+            ToolButton {
+                id: featureMenuButton
+                menu: Menu {
+                    MenuItem {
+                        id: printPage
+                        text: "Print"
+                        shortcut: StandardKey.Print
+                        onTriggered: printer.url= currentWebView.url
                     }
-                }
+                    //                enabled: currentWebView && (currentWebView.canGoBack || currentWebView.canGoForward)
+                    //                menu:Menu {
+                    //                    id: historyMenu
 
-                ToolButton {
-                    id: backButton
+                    //                    Instantiator {
+                    //                        model: currentWebView && currentWebView.navigationHistory.items
+                    //                        MenuItem {
+                    //                            text: model.title
+                    //                            onTriggered: currentWebView.goBackOrForward(model.offset)
+                    //                            checkable: !enabled
+                    //                            checked: !enabled
+                    //                            enabled: model.offset
+                    //                        }
+
+                    //                        onObjectAdded: historyMenu.insertItem(index, object)
+                    //                        onObjectRemoved: historyMenu.removeItem(object)
+                    //                    }
+                    //                }
+                }
+            }
+            ToolButton {
+                id: backButton
                     iconSource: "icons/go-previous.png"
                     onClicked: currentWebView.goBack()
                     enabled: currentWebView && currentWebView.canGoBack
@@ -363,10 +375,14 @@ ApplicationWindow {
             property color fillColor: "blue"
             frameOverlap: 1
             tab: Rectangle {
+                property int minTabWidth: 50
+                property int tabWidth: currentWebView.width / tabs.count
+                property bool show: true
                 border.color:  "white"
                 border.width : 2
                 color: styleData.selected ? fillColor : frameColor
-                implicitWidth: (text.width + 40)
+                implicitWidth: tabWidth < 220 && styleData.selected ? 300 :
+                           tabWidth >= minTabWidth ? tabWidth : tabWidth - ((minTabWidth - tabWidth)/tabs.count)
                 implicitHeight: 24
                 radius: 8
                 Rectangle { height: 1 ; width: parent.width ; color: frameColor}
@@ -375,13 +391,15 @@ ApplicationWindow {
                 id: tabButton
                 Text {
                     id: text
-                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: 18
-                    text: styleData.title
+                    anchors.horizontalCenter:  parent.horizontalCenter
+                    text: styleData.title.substring(0,tabButton.width > 300 ? 50:
+                              tabButton.width > 220 ? 45 : tabButton.width > 150? 20:
+                                 tabButton.width > 100? 13 : tabButton.width > 70? 8 : 5)
                     color: "black"
                 }
                 Button {
+                    id : button
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: 4

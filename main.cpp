@@ -63,7 +63,7 @@ typedef QGuiApplication Application;
 #include <QtWebEngine/qtwebengineglobal.h>
 #include <QWebEngineView>
 #include <QQmlComponent>
-
+#include "printer.h"
 // later Important Steps -> convert webarchive wenn
 // file was added new and app is still running
 
@@ -76,6 +76,7 @@ int main(int argc, char **argv)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     Application app(argc, argv);
+    qmlRegisterType<Printer>("version.printer", 1, 0, "Printer");
     MainWindow mainW;
     mainW.show();
     QtWebEngine::initialize();

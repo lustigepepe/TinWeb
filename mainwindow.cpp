@@ -43,7 +43,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_newSite_clicked()
 {
-    QFileInfo info( QFileDialog::getOpenFileName(this));
+    QFileInfo info(QFileDialog::getOpenFileName(this));
     QString item = info.baseName();
     QString path = info.absoluteFilePath();
     if(path.isEmpty())

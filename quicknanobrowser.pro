@@ -11,14 +11,16 @@ HEADERS += \
         document.h \
         xmllibrary.h \
         singleton.h \
-    helperWindowTool.h
+    helperWindowTool.h \
+    printer.h
 
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
         previewpage.cpp \
         document.cpp \
-        xmllibrary.cpp
+        xmllibrary.cpp \
+    printer.cpp
 
 OTHER_FILES += ApplicationRoot.qml \
                BrowserDialog.qml \
@@ -31,7 +33,7 @@ RESOURCES += resources.qrc
 FORMS += \
         mainwindow.ui
 
-QT += qml quick webengine webenginewidgets webchannel xml core
+QT += qml quick webengine webenginewidgets webchannel xml core printsupport
 #declarative
 qtHaveModule(widgets) {
     greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
