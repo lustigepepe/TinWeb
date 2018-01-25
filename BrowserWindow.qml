@@ -369,7 +369,6 @@ ApplicationWindow {
             tab.item.visible = true;
             return tab;
         }
-        anchors.fill: parent
         style: TabViewStyle {
             property color frameColor: "gainsboro"
             property color fillColor: "blue"
@@ -388,18 +387,17 @@ ApplicationWindow {
                 Rectangle { height: 1 ; width: parent.width ; color: frameColor}
                 Rectangle { height: parent.height ; width: 1; color: frameColor}
                 Rectangle { x: parent.width -1; height: parent.height ; width: 1; color: frameColor}
-                id: tabButton
+                id: tab_Button
                 Text {
                     id: text
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter:  parent.horizontalCenter
-                    text: styleData.title.substring(0,tabButton.width > 300 ? 50:
-                              tabButton.width > 220 ? 45 : tabButton.width > 150? 20:
-                                 tabButton.width > 100? 13 : tabButton.width > 70? 8 : 5)
+                    text: styleData.title.substring(0,tab_Button.width > 300 ? 50:
+                              tab_Button.width > 220 ? 35 : tab_Button.width > 150? 20:
+                                 tab_Button.width > 100? 13 : tab_Button.width > 70? 8 : 5)
                     color: "black"
                 }
                 Button {
-                    id : button
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: 4
@@ -409,14 +407,16 @@ ApplicationWindow {
                             implicitHeight: 12
                             radius: width/3
                             color: "#00000000"
-                            Text {text: "x" ; anchors.centerIn: parent ; color: tabButton.color === fillColor ? "black" : "#00000000"}
+                            Text {text: "x" ; anchors.centerIn: parent ; color: tab_Button.color === fillColor ? "black" : "#00000000"}
                         }
                     }
-                    onClicked: currentWebView.triggerWebAction(WebEngineView.RequestClose)
+                    onClicked: {currentWebView.triggerWebAction(WebEngineView.RequestClose);
+                        resetStatusText.restart();
+                    }
                 }
             }
         }
-
+        anchors.fill: parent
         Component.onCompleted: createEmptyTab(defaultProfile)
         Component {
             id: tabComponent
