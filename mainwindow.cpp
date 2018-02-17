@@ -197,6 +197,7 @@ void MainWindow::doubleClickFileBrowser(const QModelIndex &index)
         }
         else
         {
+            convertWebarchiveToHtml(path, desc);
             mainXml.xmlVec.at(index.row()).url.push_back(path);
         }
         wasModified.push_back(index);

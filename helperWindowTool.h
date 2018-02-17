@@ -118,4 +118,52 @@ void convertWebarchiveToHtml(xmlData& data, bool desc)
         }
     }
 }
+
+void convertWebarchiveToHtml(QString& url, bool desc)
+{
+    QFileInfo info(url);
+    if(info.completeSuffix() == "webarchive" && desc)
+    {
+        bool newCreated = false;
+        bool unix = QSysInfo::productType() == "winrt" ? false : true;
+        QString newFolder, newFile;
+        if(unix)
+        {
+            newFolder = (info.canonicalPath()+"/NoWebArchive");
+            newFile = newFolder + "/" + info.completeBaseName() + ".html";
+        }
+        else
+        {
+            newFolder = (info.canonicalPath()+"\\NoWebArchive");
+            newFile = newFolder + "\\"+ info.completeBaseName() + ".html";
+        }
+
+        QProcess *proc = new QProcess();
+        if(!QFile(newFile).exists())
+        {
+            newCreated = true;
+            if(!QDir(newFolder).exists())
+                QDir().mkdir(newFolder);
+
+            QString program;
+            QStringList arguments;
+            if(unix)
+            {
+                program = "/usr/bin/textutil";
+                arguments << "-convert"  << "html" << url
+                          << "-output" << newFile;
+            }
+            else
+            {
+                program = "C:\Windows\SysWOW64\textutil";
+                arguments << "-convert"  << "html" << url
+                          << "-output" << newFile;
+            }
+            proc->start(program, arguments);
+            proc->closeWriteChannel();
+        }
+        if(newCreated)
+            deAfterConvertion(newFolder);
+    }
+}
 #endif // HELPERWINDOW_H
