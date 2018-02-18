@@ -34,10 +34,16 @@ bool setOverviewListName(std::vector<QModelIndex>& indices, QStringListModel* ml
         {
             QStringList split = list.at(i).split("List: ");
             if(split.size() == 1)
-                list.replace(i,"List: "+st);
+            {
+                list.replace(i,"List: "+ st);
+                mainXml.xmlVec.at(i).name = "List: "+ st;
+
+            }
             else
-                list.replace(i, st);
-            mainXml.xmlVec.at(i).name = "List: "+ st;
+            {
+                list.replace(i, split[0] + st);
+                mainXml.xmlVec.at(i).name = split[0] + st;
+            }
         }
         else
         {
@@ -61,7 +67,7 @@ void deAfterConvertion(QString& path, QString* filter = nullptr)
     if(filter)
         list << *filter;
 
-    QThread::sleep(1);
+    QThread::sleep(2);
     QDir dir(path);
     dir.setNameFilters(list);
     dir.setFilter(QDir::Files);
