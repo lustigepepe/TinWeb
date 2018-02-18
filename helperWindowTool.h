@@ -2,6 +2,7 @@
 #define HELPERWINDOW_H
 #include <QStringListModel>
 #include <QDir>
+#include <QThread>
 #include "xmllibrary.h"
 
 QUrl startupUrl(QString* url)
@@ -59,9 +60,12 @@ void deAfterConvertion(QString& path, QString* filter = nullptr)
     list << "*.png" << "*.jpg" << "*.gif" << "*.svg";
     if(filter)
         list << *filter;
+
+    QThread::sleep(1);
     QDir dir(path);
     dir.setNameFilters(list);
     dir.setFilter(QDir::Files);
+    qDebug() << dir.entryList().size();
     foreach(QString dirFile, dir.entryList())
     {
         dir.remove(dirFile);
